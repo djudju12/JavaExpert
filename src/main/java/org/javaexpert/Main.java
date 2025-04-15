@@ -1,10 +1,33 @@
 package org.javaexpert;
 
 
-import java.util.HashMap;
-
 public class Main {
+
     public static void main(String[] args) {
+        var expert = new Expert("Expert");
+        expert.addAttribute("booleano_1");
+        expert.addAttribute("booleano_2");
+        expert.addAttribute("booleano_3");
+
+        expert.withRule("R1")
+                .iff("boleano_1").isTrue()
+                .and("boleano_2").isTrue()
+                .then("boleano_3").isFalse();
+
+        expert.addObjectives("boleano_3");
+
+        expert.addFact("boleano_1", true);
+        expert.addFact("boleano_2", false);
+
+        var conclusions = expert.think();
+        if (conclusions.isEmpty()) {
+            System.out.println("nothing has concluded");
+        } else {
+            System.out.println(conclusions);
+        }
+    }
+
+    public static void main2(String[] args) {
         var expert = new Expert("Expert");
 
         expert.addAttributes("materia_prima"       , "alta"      , "media"        , "baixa"     );
@@ -47,15 +70,16 @@ public class Main {
 
         expert.addObjectives("qualidade_final");
 
-        var facts = new HashMap<String, String>();
-        facts.put("controle_qualidade", "fraco");
-        facts.put("acabamento", "defeituoso");
-        facts.put("materia_prima", "baixa");
-        facts.put("processo_fabricacao", "ruim");
+        expert.addFact("controle_qualidade", "fraco");
+        expert.addFact("acabamento", "defeituoso");
+        expert.addFact("materia_prima", "baixa");
+        expert.addFact("processo_fabricacao", "ruim");
 
-        expert.think(facts)
-                .ifPresentOrElse(System.out::println, () -> System.out.println("Cannot conclude"));
-
-        System.out.println(facts);
+        var conclusions = expert.think();
+        if (conclusions.isEmpty()) {
+            System.out.println("nothing has concluded");
+        } else {
+            System.out.println(conclusions);
+        }
     }
 }

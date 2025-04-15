@@ -24,10 +24,10 @@ public class Rule {
     }
 
     public boolean isConclusive(Set<String> conclusiveAttributes) {
-        return conclusions.stream().anyMatch(fact -> conclusiveAttributes.contains(fact.name()));
+        return conclusions.stream().anyMatch(fact -> conclusiveAttributes.contains(fact.getName()));
     }
 
-    public boolean evaluate(Set<Rule> allRules, Map<String, String> facts) {
+    public boolean evaluate(Set<Rule> allRules, Map<String, Fact> facts) {
         var otherRules = allRules.stream().filter(other -> !other.equals(this)).collect(Collectors.toSet());
         return predicate.evaluate(otherRules, facts);
     }
@@ -42,20 +42,22 @@ public class Rule {
         return this;
     }
 
+    public Rule isTrue() {
+        assertNotNull(this.builder, "'is' without attribute");
+        var newPredicate = builder.value(true);
+        return chainNewPredicate(newPredicate);
+    }
+
+    public Rule isFalse() {
+        assertNotNull(this.builder, "'is' without attribute");
+        var newPredicate = builder.value(false);
+        return chainNewPredicate(newPredicate);
+    }
+
     public Rule is(String value) {
         assertNotNull(this.builder, "'is' without attribute");
-
-        if (lastConnector != null) {
-            chainPredicate(new SimplePredicate(builder.value(value).build()), lastConnector);
-            lastConnector = null;
-        } else if (concluding) {
-            this.conclusions.add(builder.value(value).build());
-        } else {
-            this.predicate = new SimplePredicate(builder.value(value).build());
-        }
-
-        builder = null;
-        return this;
+        var newPredicate = builder.value(value);
+        return chainNewPredicate(newPredicate);
     }
 
     public Rule and(String attribute) {
@@ -88,6 +90,20 @@ public class Rule {
 
     private static Fact.FactBuilder newBuilder(String attr) {
         return Fact.builder().attribute(attr);
+    }
+
+    private Rule chainNewPredicate(Fact fact) {
+        if (lastConnector != null) {
+            chainPredicate(new SimplePredicate(fact), lastConnector);
+            lastConnector = null;
+        } else if (concluding) {
+            this.conclusions.add(fact);
+        } else {
+            this.predicate = new SimplePredicate(fact);
+        }
+
+        builder = null;
+        return this;
     }
 
     private static void assertNull(Object o, String msg) {

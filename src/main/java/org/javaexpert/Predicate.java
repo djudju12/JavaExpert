@@ -7,9 +7,7 @@ public sealed interface Predicate permits SimplePredicate, CompoundPredicate {
 
     PredicateType type();
 
-    boolean isAbout(String attribute);
-
-    boolean evaluate(Set<Rule> rules, Map<String, String> facts);
+    boolean evaluate(Set<Rule> rules, Map<String, Fact> facts);
 
     enum PredicateType {
         SIMPLE, COMPOUND

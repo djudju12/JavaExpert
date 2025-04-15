@@ -1,31 +1,28 @@
 package org.javaexpert;
 
-public record Fact (
-        String name,
-        String value
-) {
+public sealed interface Fact permits BooleanFact, StringFact {
+    String getName();
 
-    public static FactBuilder builder() {
+    boolean isTrue(Fact predicate);
+
+    static FactBuilder builder() {
         return new FactBuilder();
     }
 
-    public static class FactBuilder {
+    class FactBuilder {
         private String attribute;
-        private String value;
 
         public FactBuilder attribute(String attr) {
             this.attribute = attr;
             return this;
         }
 
-        public FactBuilder value(String value) {
-            this.value = value;
-            return this;
+        public StringFact value(String value) {
+            return new StringFact(this.attribute, value);
         }
 
-        public Fact build() {
-            return new Fact(attribute, value);
+        public BooleanFact value(boolean value) {
+            return new BooleanFact(this.attribute, value);
         }
     }
-
 }
