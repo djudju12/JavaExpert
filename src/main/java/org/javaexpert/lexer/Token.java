@@ -37,11 +37,13 @@ public class Token {
         OU,
         E,
         ENTAO,
-        EQUAL,
         COMMA,
         OPEN_PAR,
         CLOSE_PAR,
         OBJECTIVES,
-        ATTRIBUTE
+        ATTR_NUMERIC,
+        NUM,
+        ATTRIBUTE,
+        LOGIC_OPERATOR
     }
 }

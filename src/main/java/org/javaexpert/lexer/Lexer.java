@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Character.isSpaceChar;
 import static java.lang.Character.isWhitespace;
-import static org.javaexpert.Asserts.assertFalse;
 import static org.javaexpert.Asserts.assertNotNull;
 import static org.javaexpert.Asserts.assertTrue;
+import static org.javaexpert.lexer.LogicOperator.EQ;
+import static org.javaexpert.lexer.LogicOperator.GT;
+import static org.javaexpert.lexer.LogicOperator.GTE;
+import static org.javaexpert.lexer.LogicOperator.LT;
+import static org.javaexpert.lexer.LogicOperator.LTE;
 
 public class Lexer {
     private final String filePath;
@@ -60,7 +63,7 @@ public class Lexer {
 
     public Token requireNextToken(Token.TokenType type) {
         var token = nextToken().orElseThrow(() -> new RuntimeException("unexpected EOF"));
-        assertTrue(token.getType() == type, "%s: expected '%s' found: '%s' ".formatted(token.getLocation(), type, token.getType()));
+        assertTrue(token.getType() == type, "%s: expected '%s' found: '%s' ".formatted(token.getLocation(), type, token));
         return token;
     }
 
@@ -92,7 +95,12 @@ public class Lexer {
                 }
             }
         } else {
+            char t = c;
             consumeChar();
+            if ((t == '>' || t == '<') && (c = peekChar()) == '=') {
+                sb.append(c);
+                consumeChar();
+            }
         }
 
 
@@ -105,14 +113,21 @@ public class Lexer {
             case "ENTAO" -> newToken(t, Token.TokenType.ENTAO);
             case "ATRIBUTO" -> newToken(t, Token.TokenType.ATTRIBUTE);
             case "OBJETIVOS" -> newToken(t, Token.TokenType.OBJECTIVES);
+            case "NUMERICO" -> newToken(t, Token.TokenType.ATTR_NUMERIC);
             case "(" -> newToken(t, Token.TokenType.OPEN_PAR);
             case ")" -> newToken(t, Token.TokenType.CLOSE_PAR);
-            case "=" -> newToken(t, Token.TokenType.EQUAL);
+            case "<" -> newTokenOperator(t, LT);
+            case "<=" -> newTokenOperator(t, LTE);
+            case ">" -> newTokenOperator(t, GT);
+            case ">=" -> newTokenOperator(t, GTE);
+            case "=" -> newTokenOperator(t, EQ);
             case "," -> newToken(t, Token.TokenType.COMMA);
             default -> {
                 var loc = currentLoc(t.length());
                 if (t.startsWith("\"") && t.endsWith("\"")) {
                     yield Optional.of(new TokenStr(loc, t.substring(1, t.length() - 1)));
+                } else if (t.matches("^-?\\d+(\\.\\d+)?$")) {
+                    yield Optional.of(new TokenNum(loc, Float.parseFloat(t)));
                 }
 
                 throw new IllegalStateException("%s: Invalid token '%s'".formatted(loc, t));
@@ -121,11 +136,15 @@ public class Lexer {
     }
 
     private static boolean isOneCharToken(char c) {
-        return ",)(".indexOf(c) >= 0;
+        return ",)(><=".indexOf(c) >= 0;
     }
 
     private Optional<Token> newToken(String token, Token.TokenType type) {
         return Optional.of(new Token(currentLoc(token.length()), type));
+    }
+
+    private Optional<Token> newTokenOperator(String token, LogicOperator op) {
+        return Optional.of(new TokenLogicOperator(currentLoc(token.length()), op));
     }
 
     private Token.Location currentLoc(int tokenLen) {

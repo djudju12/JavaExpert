@@ -15,11 +15,21 @@ public record CompoundPredicate(
     }
 
     @Override
-    public boolean isTrue(Set<Rule> rules, Map<String, Fact> facts) {
+    public String name() {
+        return "CompoundPredicate";
+    }
+
+    @Override
+    public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts) {
         return switch (connector) {
             case AND -> lhs().isTrue(rules, facts) && rhs().isTrue(rules, facts);
             case OR -> lhs().isTrue(rules, facts) || rhs().isTrue(rules, facts);
         };
+    }
+
+    @Override
+    public boolean validateFact(Fact<?> fact) {
+        throw new UnsupportedOperationException();
     }
 
 }
