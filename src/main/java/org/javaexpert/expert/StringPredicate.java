@@ -2,9 +2,6 @@ package org.javaexpert.expert;
 
 import org.javaexpert.lexer.LogicOperator;
 
-import java.util.Map;
-import java.util.Set;
-
 public record StringPredicate(
         String name,
         String value,

@@ -15,7 +15,7 @@ public class Main {
         var expert = Expert.fromFile("example_numerico.ex");
         var facts = new HashMap<String, Fact<?>>();
 
-        facts.put("idade", new NumericFact("idade", 21));
+        facts.put("idade", new NumericFact("idade", 65));
         facts.put("sexo", new StringFact("sexo", "masculino"));
 
 //        facts.put("controle_qualidade", new StringFact("controle_qualidade", "rigoroso"));

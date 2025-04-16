@@ -103,7 +103,6 @@ public class Lexer {
             }
         }
 
-
         var t = sb.toString();
         return switch (t) {
             case "REGRA" -> newToken(t, Token.TokenType.RULE);

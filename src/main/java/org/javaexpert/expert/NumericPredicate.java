@@ -2,9 +2,6 @@ package org.javaexpert.expert;
 
 import org.javaexpert.lexer.LogicOperator;
 
-import java.util.Map;
-import java.util.Set;
-
 record NumericPredicate(
     String name,
     float value,
