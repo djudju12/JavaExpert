@@ -7,7 +7,7 @@
     <artifactId>java-expert</artifactId>
     <version>0.0.1</version>
     <name>java-expert</name>
-    <description>ms-auth</description>
+    <description>java-expert</description>
     <properties>
         <java.version>22</java.version>
         <maven.compiler.source>22</maven.compiler.source>
@@ -16,11 +16,18 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <version>3.1.2</version>
+            <type>maven-plugin</type>
         </dependency>
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
         </plugins>
     </build>

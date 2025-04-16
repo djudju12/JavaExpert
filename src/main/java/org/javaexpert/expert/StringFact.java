@@ -1,4 +1,4 @@
-package org.javaexpert;
+package org.javaexpert.expert;
 
 public record StringFact(
         String name,
@@ -8,15 +8,6 @@ public record StringFact(
     @Override
     public String getName() {
         return name();
-    }
-
-    @Override
-    public boolean isTrue(Fact predicate) {
-        if (predicate instanceof StringFact stringPredicate) {
-            return stringPredicate.equals(this);
-        }
-
-        return false;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.javaexpert;
+package org.javaexpert.expert;
 
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +15,10 @@ public record CompoundPredicate(
     }
 
     @Override
-    public boolean evaluate(Set<Rule> rules, Map<String, Fact> facts) {
+    public boolean isTrue(Set<Rule> rules, Map<String, Fact> facts) {
         return switch (connector) {
-            case AND -> lhs().evaluate(rules, facts) && rhs().evaluate(rules, facts);
-            case OR -> lhs().evaluate(rules, facts) || rhs().evaluate(rules, facts);
+            case AND -> lhs().isTrue(rules, facts) && rhs().isTrue(rules, facts);
+            case OR -> lhs().isTrue(rules, facts) || rhs().isTrue(rules, facts);
         };
     }
 
