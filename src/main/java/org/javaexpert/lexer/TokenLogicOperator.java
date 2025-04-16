@@ -1,5 +1,7 @@
 package org.javaexpert.lexer;
 
+import org.javaexpert.expert.predicate.LogicOperator;
+
 public class TokenLogicOperator extends Token {
     private final LogicOperator value;
 

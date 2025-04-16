@@ -23,13 +23,6 @@ public class Token {
         return "(%s, )".formatted(type);
     }
 
-    public record Location (String filePath, int row, int col) {
-        @Override
-        public String toString() {
-            return "%s:%d:%d".formatted(filePath, row, col);
-        }
-    }
-
     public enum TokenType {
         STR,
         RULE,

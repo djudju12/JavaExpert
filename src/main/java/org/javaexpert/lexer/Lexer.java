@@ -1,5 +1,7 @@
 package org.javaexpert.lexer;
 
+import org.javaexpert.expert.predicate.LogicOperator;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,11 +14,11 @@ import static java.lang.Character.isSpaceChar;
 import static java.lang.Character.isWhitespace;
 import static org.javaexpert.Asserts.assertNotNull;
 import static org.javaexpert.Asserts.assertTrue;
-import static org.javaexpert.lexer.LogicOperator.EQ;
-import static org.javaexpert.lexer.LogicOperator.GT;
-import static org.javaexpert.lexer.LogicOperator.GTE;
-import static org.javaexpert.lexer.LogicOperator.LT;
-import static org.javaexpert.lexer.LogicOperator.LTE;
+import static org.javaexpert.expert.predicate.LogicOperator.EQ;
+import static org.javaexpert.expert.predicate.LogicOperator.GT;
+import static org.javaexpert.expert.predicate.LogicOperator.GTE;
+import static org.javaexpert.expert.predicate.LogicOperator.LT;
+import static org.javaexpert.expert.predicate.LogicOperator.LTE;
 
 public class Lexer {
     private final String filePath;
@@ -146,8 +148,8 @@ public class Lexer {
         return Optional.of(new TokenLogicOperator(currentLoc(token.length()), op));
     }
 
-    private Token.Location currentLoc(int tokenLen) {
-        return new Token.Location(filePath, row, col - tokenLen);
+    private Location currentLoc(int tokenLen) {
+        return new Location(filePath, row, col - tokenLen);
     }
 
     private String readFile(String filePath) throws IOException {

@@ -1,5 +1,8 @@
 package org.javaexpert.expert;
 
+import org.javaexpert.expert.fact.Fact;
+import org.javaexpert.expert.predicate.Predicate;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;

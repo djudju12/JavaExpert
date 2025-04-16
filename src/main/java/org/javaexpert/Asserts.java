@@ -1,6 +1,6 @@
 package org.javaexpert;
 
-import org.javaexpert.lexer.Token;
+import org.javaexpert.lexer.Location;
 
 public class Asserts {
 
@@ -30,7 +30,12 @@ public class Asserts {
         }
     }
 
-    public static void assertTrue(boolean b, String msg, Token.Location loc) {
+    public static void assertTrue(boolean b, String msg, Location loc) {
         assertTrue(b, "%s: %s".formatted(loc, msg));
     }
+
+    public static void assertNotNull(Object o, String msg, Location loc) {
+        assertNotNull(o, "%s: %s".formatted(loc, msg));
+    }
+
 }

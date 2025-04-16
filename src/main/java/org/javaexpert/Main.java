@@ -2,9 +2,9 @@ package org.javaexpert;
 
 
 import org.javaexpert.expert.Expert;
-import org.javaexpert.expert.Fact;
-import org.javaexpert.expert.NumericFact;
-import org.javaexpert.expert.StringFact;
+import org.javaexpert.expert.fact.Fact;
+import org.javaexpert.expert.fact.NumericFact;
+import org.javaexpert.expert.fact.StringFact;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,10 +13,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         var expert = Expert.fromFile("example_numerico.ex");
-        var facts = new HashMap<String, Fact<?>>();
 
-        facts.put("idade", new NumericFact("idade", 65));
-        facts.put("sexo", new StringFact("sexo", "masculino"));
+        expert.newFact("idade", "65");
+        expert.newFact("sexo", "masculino");
 
 //        facts.put("controle_qualidade", new StringFact("controle_qualidade", "rigoroso"));
 //        facts.put("acabamento", new StringFact("acabamento", "excelente"));
@@ -28,7 +27,7 @@ public class Main {
 //        facts.put("materia_prima", new StringFact("materia_prima", "baixa"));
 //        facts.put("processo_fabricacao", new StringFact("processo_fabricacao", "ruim"));
 
-        var conclusions = expert.thinkAboutFacts(facts);
+        var conclusions = expert.think();
         System.out.println(conclusions);
     }
 }

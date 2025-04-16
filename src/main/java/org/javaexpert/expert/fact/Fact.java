@@ -1,4 +1,4 @@
-package org.javaexpert.expert;
+package org.javaexpert.expert.fact;
 
 public abstract class Fact<T> {
 

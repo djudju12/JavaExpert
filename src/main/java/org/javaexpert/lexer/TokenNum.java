@@ -4,7 +4,7 @@ public class TokenNum extends Token {
     private final float value;
 
     public TokenNum(Location location, float value) {
-        super(location, TokenType.STR);
+        super(location, TokenType.NUM);
         this.value = value;
     }
 

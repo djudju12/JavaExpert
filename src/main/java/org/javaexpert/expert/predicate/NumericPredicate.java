@@ -1,21 +1,17 @@
-package org.javaexpert.expert;
+package org.javaexpert.expert.predicate;
 
-import org.javaexpert.lexer.LogicOperator;
+import org.javaexpert.expert.fact.Fact;
+import org.javaexpert.expert.fact.NumericFact;
 
-record NumericPredicate(
+public record NumericPredicate(
     String name,
     float value,
     LogicOperator operator
-) implements Predicate {
+) implements SimplePredicate {
 
     @Override
     public String toString() {
         return "%s: %s".formatted(name, value);
-    }
-
-    @Override
-    public PredicateType type() {
-        return PredicateType.SIMPLE;
     }
 
     @Override

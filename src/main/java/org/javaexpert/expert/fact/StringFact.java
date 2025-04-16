@@ -1,4 +1,4 @@
-package org.javaexpert.expert;
+package org.javaexpert.expert.fact;
 
 public class StringFact extends Fact<String> {
     public StringFact(String name, String value) {

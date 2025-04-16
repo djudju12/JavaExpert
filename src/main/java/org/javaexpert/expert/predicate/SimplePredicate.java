@@ -1,17 +1,16 @@
-package org.javaexpert.expert;
+package org.javaexpert.expert.predicate;
+
+import org.javaexpert.expert.Rule;
+import org.javaexpert.expert.fact.Fact;
 
 import java.util.Map;
 import java.util.Set;
 
-public sealed interface Predicate permits NumericPredicate, StringPredicate, CompoundPredicate {
-
-    PredicateType type();
+public sealed interface SimplePredicate extends Predicate permits StringPredicate, NumericPredicate {
 
     String name();
 
-    enum PredicateType {
-        SIMPLE, COMPOUND
-    }
+    boolean validateFact(Fact<?> fact);
 
     default boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts) {
         var fact = facts.get(name());
@@ -29,5 +28,4 @@ public sealed interface Predicate permits NumericPredicate, StringPredicate, Com
         return false;
     }
 
-    boolean validateFact(Fact<?> fact);
 }

@@ -1,3 +1,3 @@
-package org.javaexpert.expert;
+package org.javaexpert.expert.attribute;
 
 public record NumericAttribute(String name) implements Attribute { }

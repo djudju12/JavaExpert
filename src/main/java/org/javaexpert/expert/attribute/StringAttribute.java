@@ -1,4 +1,4 @@
-package org.javaexpert.expert;
+package org.javaexpert.expert.attribute;
 
 import java.util.HashSet;
 import java.util.Set;
