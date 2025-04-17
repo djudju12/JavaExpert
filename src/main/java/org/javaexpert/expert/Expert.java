@@ -20,11 +20,13 @@ import org.javaexpert.lexer.TokenStr;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.javaexpert.Asserts.assertNotNull;
 import static org.javaexpert.Asserts.assertTrue;
 import static org.javaexpert.expert.predicate.LogicConnector.AND;
@@ -35,6 +37,7 @@ public class Expert {
     private final Map<String, Attribute> attributes;
     private final Set<String> objectives;
     private final Map<String, Fact<?>> facts = new TreeMap<>();
+    private final StringBuilder log = new StringBuilder();
 
     protected Expert(Map<String, Attribute> attrs, Map<String, Rule> rules, Set<String> objectives) {
         this.rules = rules;
@@ -46,47 +49,46 @@ public class Expert {
         return new Parser(filePath).parse();
     }
 
-    public Set<Fact<?>> think() {
-        System.out.println("\n========================= JAVA EXPERT =========================");
+    public void clearMemory() {
+        facts.clear();
+        log.setLength(0);
+    }
+
+    public Optional<Rule> think() {
+        log.append("\n========================= JAVA EXPERT =========================\n");
 
         var tree = new TreeLogger();
-        var conclusions = conclusiveRules()
+        var acceptedRule = conclusiveRules()
                 .stream()
                 .filter(rule -> {
                     if (rule.isTrue(new TreeSet<>(rules.values()), facts, tree)) {
-                        tree.print();
-                        System.out.printf("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name());
+                        log.append(tree.print());
+                        log.append(format("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name()));
                         return true;
                     }
 
                     return false;
                 })
-                .findFirst()
-                .map(Rule::conclusions)
-                .orElse(Set.of());
+                .findFirst();
 
-        System.out.println("\n========================= JAVA EXPERT =========================");
-        return conclusions;
+        log.append("\n========================= JAVA EXPERT =========================\n");
+        return acceptedRule;
     }
 
-    public void newFact(String attrName, String value) {
-        var attr = attributes.get(attrName);
-        assertNotNull(attr, "attribute '%s' not found".formatted(attrName));
-        if (attr instanceof StringAttribute strAttr) {
-            assertTrue(strAttr.values().contains(value), "invalid fact. '%s' is not a valid value for '%s'".formatted(value, attrName));
-            facts.put(attrName, new StringFact(attrName, value));
-        } else {
-            throw new IllegalStateException("invalid fact. Attribute '%s' is not a string".formatted(attrName));
-        }
+    public String print() {
+        return log.toString();
     }
 
-    public void newFact(String attrName, int value) {
+    public <T> void newFact(String attrName, T value) {
         var attr = attributes.get(attrName);
         assertNotNull(attr, "attribute '%s' not found".formatted(attrName));
         if (attr instanceof NumericAttribute) {
-            facts.put(attrName, new NumericFact(attrName, value));
+            facts.put(attrName, new NumericFact(attrName, (int) value));
+        } else if (attr instanceof StringAttribute strAttr) {
+            assertTrue(strAttr.values().contains((String) value), "invalid fact. '%s' is not a valid value for '%s'".formatted(value, attrName));
+            facts.put(attrName, new StringFact(attrName, (String) value));
         } else {
-            throw new IllegalStateException("invalid fact. Attribute '%s' is not a number".formatted(attrName));
+            throw new IllegalStateException("invalid fact. Attribute '%s' is not a number or string".formatted(attrName));
         }
     }
 

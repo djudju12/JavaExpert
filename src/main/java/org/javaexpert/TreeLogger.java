@@ -29,7 +29,7 @@ public class TreeLogger {
         return node;
     }
 
-    public void print() {
+    public String print() {
         var maxSize = roots
                 .stream()
                 .mapToInt(root -> maxSize(root, 0, lengthOfContent(root, 0)))
@@ -50,7 +50,7 @@ public class TreeLogger {
             }
         }
 
-        System.out.println(String.join("\n", lines));
+        return String.join("\n", lines);
     }
     
     private void print(Node node, int depth, boolean lastChild, int maxSize) {
@@ -79,11 +79,12 @@ public class TreeLogger {
         if (parent.children().size() > 1) {
             var i = parent.children().indexOf(node);
             if (i > 0 && depth > 0) {
-                var nextSinblingChildCount = parent.children().get(i - 1).children().size();
-                for (int j = 1; j <= nextSinblingChildCount; j++) {
+                var siblingsChildCnt = parent.children().get(i - 1).children().size();
+                for (int j = 1; j <= siblingsChildCnt; j++) {
                     var lineI = lines.size() - 1 - j;
                     var siblingLine = lines.get(lineI);
-                    var newLine = siblingLine.substring(0, depth * 2 + 1) +
+                    var newLine =
+                            siblingLine.substring(0, depth * 2 + 1) +
                             (siblingLine.charAt(depth * 2 + 1) == ' ' ? "|" : siblingLine.charAt(depth * 2 + 1)) +
                             siblingLine.substring(depth * 2 + 2);
                     lines.set(lineI, newLine);

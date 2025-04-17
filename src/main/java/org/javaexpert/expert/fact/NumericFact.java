@@ -1,7 +1,7 @@
 package org.javaexpert.expert.fact;
 
-public class NumericFact extends Fact<Float> {
+public class NumericFact extends Fact<Integer> {
     public NumericFact(String name, int value) {
-        super(name, (float) value);
+        super(name, value);
     }
 }
