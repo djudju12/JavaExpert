@@ -10,15 +10,13 @@ public record NumericPredicate(
         LogicOperator operator
 ) implements SimplePredicate {
 
-    private final static TreeLogger logger = TreeLogger.instance();
-
     @Override
     public String toString() {
         return "%s: %s".formatted(name, value);
     }
 
     @Override
-    public boolean validateFact(Fact<?> fact, TreeLogger.Node parent) {
+    public boolean validateFact(Fact<?> fact, TreeLogger tree, TreeLogger.Node parent) {
         if (fact instanceof NumericFact numFact) {
             var ret = switch (operator()) {
                 case EQ -> numFact.getValue() == value();
@@ -28,10 +26,15 @@ public record NumericPredicate(
                 case LTE -> numFact.getValue() <= value();
             };
 
-            logger.appendf(parent, "'%s': %s %s %s? %s", name(), numFact.getValue(), operator(), value(), ret ? "~>[VERDADEIRO]" : "~>[FALSO]");
+            tree.appendf(
+                    parent,
+                    "'%s': %s %s %s? %s", name(), numFact.getValue(), operator(), value(),
+                    ret ? "~>[VERDADEIRO]" : "~>[FALSO]"
+            );
+
             return ret;
         } else {
-            throw new RuntimeException("some inconsistency between facts and rules");
+            throw new RuntimeException("inconsistency between facts and rules");
         }
     }
 }

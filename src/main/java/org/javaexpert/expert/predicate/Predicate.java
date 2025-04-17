@@ -9,6 +9,6 @@ import java.util.Set;
 
 public sealed interface Predicate permits SimplePredicate, CompoundPredicate {
 
-    boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger.Node parent);
+    boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger tree, TreeLogger.Node parent);
 
 }

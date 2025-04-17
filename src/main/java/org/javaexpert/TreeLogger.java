@@ -2,22 +2,15 @@ package org.javaexpert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
 public class TreeLogger {
 
-    private static final TreeLogger INSTANCE = new TreeLogger();
-
     private final List<Node> roots = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
 
-    protected TreeLogger() { }
-
-    public static TreeLogger instance() {
-        return INSTANCE;
-    }
+    public TreeLogger() { }
 
     public Node appendf(Node parent, String fmt, Object ...objects) {
         return append(parent, format(fmt, objects));
@@ -34,7 +27,26 @@ public class TreeLogger {
         return node;
     }
 
-    public void print(Node node, int depth, boolean lastChild, int maxSize) {
+    public void print() {
+        for (var root: roots) {
+            lines.add(format("\n> %s", root.content()));
+            var max = maxSize(root, 0, lengthOfContent(root, 0));
+            for (int i = 0; i < root.children().size(); i++) {
+                var isLast = i == root.children.size() - 1;
+                print(root.children().get(i), 0, isLast, max);
+                if (isLast) {
+                    var lastLine = lines.getLast();
+                    if (lastLine.startsWith("|")) {
+                        lines.set(lines.size() - 1, lastLine.replaceFirst("\\|", ""));
+                    }
+                }
+            }
+        }
+
+        System.out.println(String.join("\n", lines));
+    }
+
+    private void print(Node node, int depth, boolean lastChild, int maxSize) {
         var padIndex = node.content().lastIndexOf("~>");
         var line = new StringBuilder();
         if (depth != 0) {
@@ -59,25 +71,6 @@ public class TreeLogger {
             print(node.children().get(i), depth + 1, i == node.children().size() - 1, maxSize);
         }
 
-    }
-
-    public void print() {
-        for (var root: roots) {
-            lines.add(format("\n> %s", root.content()));
-            var max = maxSize(root, 0, lengthOfContent(root, 0));
-            for (int i = 0; i < root.children().size(); i++) {
-                var isLast = i == root.children.size() - 1;
-                print(root.children().get(i), 0, isLast, max);
-                if (isLast) {
-                    var lastLine = lines.getLast();
-                    if (lastLine.startsWith("|")) {
-                        lines.set(lines.size() - 1, lastLine.replaceFirst("\\|", ""));
-                    }
-                }
-            }
-        }
-
-        System.out.println(String.join("\n", lines));
     }
 
     private int maxSize(Node node, int depth, int current) {

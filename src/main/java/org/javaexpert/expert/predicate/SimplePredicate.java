@@ -11,19 +11,19 @@ public sealed interface SimplePredicate extends Predicate permits StringPredicat
 
     String name();
 
-    boolean validateFact(Fact<?> fact, TreeLogger.Node parent);
+    boolean validateFact(Fact<?> fact, TreeLogger tree, TreeLogger.Node parent);
 
     @Override
-    default boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger.Node parent) {
+    default boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger tree, TreeLogger.Node parent) {
         var fact = facts.get(name());
         if (fact != null) {
-            return validateFact(fact, parent);
+            return validateFact(fact, tree, parent);
         }
 
         for (var rule: rules) {
             var isAboutPredicate = rule.conclusions().stream().anyMatch(f -> f.getName().equals(name()));
-            if (isAboutPredicate && rule.isTrue(rules, facts, parent)) {
-                return validateFact(facts.get(name()), parent);
+            if (isAboutPredicate && rule.isTrue(rules, facts, tree, parent)) {
+                return validateFact(facts.get(name()), tree, parent);
             }
         }
 

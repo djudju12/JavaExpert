@@ -49,11 +49,12 @@ public class Expert {
     public Set<Fact<?>> think() {
         System.out.println("\n========================= JAVA EXPERT =========================");
 
+        var tree = new TreeLogger();
         var conclusions = conclusiveRules()
                 .stream()
                 .filter(rule -> {
-                    if (rule.isTrue(new TreeSet<>(rules.values()), facts)) {
-                        TreeLogger.instance().print();
+                    if (rule.isTrue(new TreeSet<>(rules.values()), facts, tree)) {
+                        tree.print();
                         System.out.printf("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name());
                         return true;
                     }

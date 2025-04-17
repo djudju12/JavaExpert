@@ -9,26 +9,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public record Rule(String name, Predicate predicate, Set<Fact<?>> conclusions) implements Comparable<Rule> {
-    private final static TreeLogger logger = TreeLogger.instance();
 
-    public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts) {
-        return isTrue(rules, facts, null);
+    public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger tree) {
+        return isTrue(rules, facts, tree, null);
     }
 
-    public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger.Node parent) {
-        var child = logger.appendf(parent, "REGRA '%s':", name());
+    public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger tree, TreeLogger.Node parent) {
+        var child = tree.appendf(parent, "REGRA '%s':", name());
         var otherRules = rules.stream().filter(rule -> !rule.equals(this)).collect(Collectors.toSet());
-        var isRuleTrue =  predicate.isTrue(otherRules, facts, child);
+        var isRuleTrue =  predicate.isTrue(otherRules, facts, tree, child);
         if (isRuleTrue) {
 //            logger.appendf(child, "RESULTADO: VERDADEIRA");
-            var then = logger.appendf(child, "REGRA '%s' APLICADA", name());
+            var then = tree.appendf(child, "REGRA '%s' APLICADA", name());
             conclusions().forEach(f -> {
-                logger.appendf(then, "'%s' := '%s'", f.getName(), f.getValue());
+                tree.appendf(then, "'%s' := '%s'", f.getName(), f.getValue());
                 facts.putIfAbsent(f.getName(), f);
             });
 
         } else {
-            logger.appendf(child, "REGRA '%s' NÃO APLICADA", name());
+            tree.appendf(child, "REGRA '%s' NÃO APLICADA", name());
         }
 
         return isRuleTrue;
