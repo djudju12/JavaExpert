@@ -7,9 +7,6 @@ import org.javaexpert.expert.fact.Fact;
 import java.util.Map;
 import java.util.Set;
 
-import static org.javaexpert.expert.predicate.LogicConnector.AND;
-import static org.javaexpert.expert.predicate.LogicConnector.OR;
-
 public record CompoundPredicate(
         Predicate lhs,
         Predicate rhs,
@@ -21,7 +18,7 @@ public record CompoundPredicate(
         var a = lhs().isTrue(rules, facts, tree, parent);
         return switch (connector) {
             case AND -> (a && tree.appendf(parent, "%s...", connector) != null) && rhs().isTrue(rules, facts, tree, parent);
-            case OR -> (a && tree.appendf(parent, "%s...", connector) != null) || rhs().isTrue(rules, facts, tree, parent);
+            case OR -> (a || tree.appendf(parent, "%s...", connector) != null) || rhs().isTrue(rules, facts, tree, parent);
         };
     }
 

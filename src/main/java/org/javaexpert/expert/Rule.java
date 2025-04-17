@@ -19,7 +19,6 @@ public record Rule(String name, Predicate predicate, Set<Fact<?>> conclusions) i
         var otherRules = rules.stream().filter(rule -> !rule.equals(this)).collect(Collectors.toSet());
         var isRuleTrue =  predicate.isTrue(otherRules, facts, tree, child);
         if (isRuleTrue) {
-//            logger.appendf(child, "RESULTADO: VERDADEIRA");
             var then = tree.appendf(child, "REGRA '%s' APLICADA", name());
             conclusions().forEach(f -> {
                 tree.appendf(then, "'%s' := '%s'", f.getName(), f.getValue());

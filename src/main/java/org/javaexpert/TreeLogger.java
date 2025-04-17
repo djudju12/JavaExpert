@@ -2,6 +2,7 @@ package org.javaexpert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
 
@@ -9,6 +10,7 @@ public class TreeLogger {
 
     private final List<Node> roots = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
+    private int counter = 1;
 
     public TreeLogger() { }
 
@@ -17,7 +19,7 @@ public class TreeLogger {
     }
 
     public Node append(Node parent, String content) {
-        var node = new Node(content, parent);
+        var node = new Node(content, parent, counter++);
         if (parent == null) {
             roots.add(node);
         } else {
@@ -28,12 +30,17 @@ public class TreeLogger {
     }
 
     public void print() {
+        var maxSize = roots
+                .stream()
+                .mapToInt(root -> maxSize(root, 0, lengthOfContent(root, 0)))
+                .max()
+                .orElse(0);
+
         for (var root: roots) {
             lines.add(format("\n> %s", root.content()));
-            var max = maxSize(root, 0, lengthOfContent(root, 0));
             for (int i = 0; i < root.children().size(); i++) {
                 var isLast = i == root.children.size() - 1;
-                print(root.children().get(i), 0, isLast, max);
+                print(root.children().get(i), 0, isLast, maxSize);
                 if (isLast) {
                     var lastLine = lines.getLast();
                     if (lastLine.startsWith("|")) {
@@ -45,11 +52,12 @@ public class TreeLogger {
 
         System.out.println(String.join("\n", lines));
     }
-
+    
     private void print(Node node, int depth, boolean lastChild, int maxSize) {
         var padIndex = node.content().lastIndexOf("~>");
         var line = new StringBuilder();
-        if (depth != 0) {
+
+        if (depth > 0) {
             line.append("|");
             line.repeat(' ', depth * 2);
         }
@@ -67,10 +75,25 @@ public class TreeLogger {
 
         lines.add(line.toString());
 
+        var parent = node.parent();
+        if (parent.children().size() > 1) {
+            var i = parent.children().indexOf(node);
+            if (i > 0 && depth > 0) {
+                var nextSinblingChildCount = parent.children().get(i - 1).children().size();
+                for (int j = 1; j <= nextSinblingChildCount; j++) {
+                    var lineI = lines.size() - 1 - j;
+                    var siblingLine = lines.get(lineI);
+                    var newLine = siblingLine.substring(0, depth * 2 + 1) +
+                            (siblingLine.charAt(depth * 2 + 1) == ' ' ? "|" : siblingLine.charAt(depth * 2 + 1)) +
+                            siblingLine.substring(depth * 2 + 2);
+                    lines.set(lineI, newLine);
+                }
+            }
+        }
+
         for (int i = 0; i < node.children().size(); i++) {
             print(node.children().get(i), depth + 1, i == node.children().size() - 1, maxSize);
         }
-
     }
 
     private int maxSize(Node node, int depth, int current) {
@@ -84,7 +107,7 @@ public class TreeLogger {
 
     private static int lengthOfContent(Node node, int depth) {
         var padIndex = node.content().lastIndexOf("~>");
-        var implicitChars = depth == 0 ? 2 : depth*4;
+        var implicitChars = depth == 0 ? 5 : 6 + depth*2;
         if (padIndex > 0) {
             implicitChars -= (node.content().length() - padIndex);
         }
@@ -92,14 +115,27 @@ public class TreeLogger {
         return node.content().length() + implicitChars;
     }
 
-    public record Node(String content, Node parent, List<Node> children) {
-        public Node(String content, Node parent) {
-            this(content, parent, new ArrayList<>());
+    public record Node(String content, Node parent, List<Node> children, int id) {
+        public Node(String content, Node parent, int id) {
+            this(content, parent, new ArrayList<>(), id);
         }
 
         @Override
         public String toString() {
             return "Node: " + content;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node node = (Node) o;
+            return id == node.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(id);
         }
     }
 
