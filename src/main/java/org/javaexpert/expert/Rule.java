@@ -15,7 +15,7 @@ public record Rule(String name, Predicate predicate, Set<Fact<?>> conclusions) i
     }
 
     public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger tree, TreeLogger.Node parent) {
-        var child = tree.appendf(parent, "REGRA '%s':", name());
+        var child = tree.appendf(parent, "ENTRANDO NA REGRA '%s':", name());
         var otherRules = rules.stream().filter(rule -> !rule.equals(this)).collect(Collectors.toSet());
         var isRuleTrue =  predicate.isTrue(otherRules, facts, tree, child);
         if (isRuleTrue) {

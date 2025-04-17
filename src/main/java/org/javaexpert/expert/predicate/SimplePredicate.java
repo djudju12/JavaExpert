@@ -20,9 +20,11 @@ public sealed interface SimplePredicate extends Predicate permits StringPredicat
             return validateFact(fact, tree, parent);
         }
 
+        var child = tree.appendf(parent, "PROCURANDO '%s'...", name());
+
         for (var rule: rules) {
             var isAboutPredicate = rule.conclusions().stream().anyMatch(f -> f.getName().equals(name()));
-            if (isAboutPredicate && rule.isTrue(rules, facts, tree, parent)) {
+            if (isAboutPredicate && rule.isTrue(rules, facts, tree, child)) {
                 return validateFact(facts.get(name()), tree, parent);
             }
         }
