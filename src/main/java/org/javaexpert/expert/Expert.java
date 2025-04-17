@@ -1,27 +1,28 @@
 package org.javaexpert.expert;
 
+import org.javaexpert.TreeLogger;
 import org.javaexpert.expert.attribute.Attribute;
 import org.javaexpert.expert.attribute.NumericAttribute;
 import org.javaexpert.expert.attribute.StringAttribute;
 import org.javaexpert.expert.fact.Fact;
 import org.javaexpert.expert.fact.NumericFact;
+import org.javaexpert.expert.fact.StringFact;
 import org.javaexpert.expert.predicate.CompoundPredicate;
+import org.javaexpert.expert.predicate.LogicOperator;
 import org.javaexpert.expert.predicate.NumericPredicate;
 import org.javaexpert.expert.predicate.Predicate;
-import org.javaexpert.expert.fact.StringFact;
 import org.javaexpert.expert.predicate.StringPredicate;
 import org.javaexpert.lexer.Lexer;
-import org.javaexpert.expert.predicate.LogicOperator;
 import org.javaexpert.lexer.Token;
 import org.javaexpert.lexer.TokenLogicOperator;
 import org.javaexpert.lexer.TokenNum;
 import org.javaexpert.lexer.TokenStr;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static org.javaexpert.Asserts.assertNotNull;
@@ -33,7 +34,7 @@ public class Expert {
     private final Map<String, Rule> rules;
     private final Map<String, Attribute> attributes;
     private final Set<String> objectives;
-    private final Map<String, Fact<?>> facts = new HashMap<>();
+    private final Map<String, Fact<?>> facts = new TreeMap<>();
 
     protected Expert(Map<String, Attribute> attrs, Map<String, Rule> rules, Set<String> objectives) {
         this.rules = rules;
@@ -46,12 +47,25 @@ public class Expert {
     }
 
     public Set<Fact<?>> think() {
-        return conclusiveRules()
+        System.out.println("\n========================= JAVA EXPERT =========================");
+
+        var conclusions = conclusiveRules()
                 .stream()
-                .filter(rule -> rule.isTrue(new HashSet<>(rules.values()), facts))
+                .filter(rule -> {
+                    if (rule.isTrue(new TreeSet<>(rules.values()), facts)) {
+                        TreeLogger.instance().print();
+                        System.out.printf("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name());
+                        return true;
+                    }
+
+                    return false;
+                })
                 .findFirst()
                 .map(Rule::conclusions)
                 .orElse(Set.of());
+
+        System.out.println("\n========================= JAVA EXPERT =========================");
+        return conclusions;
     }
 
     public void newFact(String attrName, String value) {
@@ -82,14 +96,14 @@ public class Expert {
                 var conclusionNames = rule.conclusions().stream().map(Fact::getName).collect(Collectors.toSet());
                 return conclusionNames.stream().anyMatch(objectives::contains);
             })
-            .collect(Collectors.toSet());
+            .collect(Collectors.toCollection(TreeSet::new));
     }
 
     private static class Parser {
 
-        private final Map<String, Rule> rules = new HashMap<>();
-        private final Map<String, Attribute> attrs = new HashMap<>();
-        private final Set<String> objectives = new HashSet<>();
+        private final Map<String, Rule> rules = new TreeMap<>();
+        private final Map<String, Attribute> attrs = new TreeMap<>();
+        private final Set<String> objectives = new TreeSet<>();
 
         private final Lexer lexer;
 
@@ -121,7 +135,7 @@ public class Expert {
         }
 
         private Set<String> parseObjectives() {
-            var objs = new HashSet<String>();
+            var objs = new TreeSet<String>();
             var token = lexer.requireNextToken(Token.TokenType.OPEN_PAR);
             do {
                 token = lexer.requireNextToken(Token.TokenType.STR);
@@ -166,7 +180,7 @@ public class Expert {
         }
 
         private Set<Fact<?>> parseEntao() {
-            var conclusions = new HashSet<Fact<?>>();
+            var conclusions = new TreeSet<Fact<?>>();
             Token token;
             do {
                 conclusions.add(parseFact());

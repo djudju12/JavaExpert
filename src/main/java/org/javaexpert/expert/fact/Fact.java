@@ -1,6 +1,6 @@
 package org.javaexpert.expert.fact;
 
-public abstract class Fact<T> {
+public abstract class Fact<T> implements Comparable<Fact<T>> {
 
     private final String name;
     private final T value;
@@ -25,4 +25,10 @@ public abstract class Fact<T> {
                 ", value=" + value +
                 '}';
     }
+
+    @Override
+    public int compareTo(Fact<T> fact) {
+        return fact.getName().compareTo(name);
+    }
+
 }

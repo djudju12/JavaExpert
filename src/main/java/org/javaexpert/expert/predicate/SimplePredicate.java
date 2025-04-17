@@ -1,5 +1,6 @@
 package org.javaexpert.expert.predicate;
 
+import org.javaexpert.TreeLogger;
 import org.javaexpert.expert.Rule;
 import org.javaexpert.expert.fact.Fact;
 
@@ -10,18 +11,19 @@ public sealed interface SimplePredicate extends Predicate permits StringPredicat
 
     String name();
 
-    boolean validateFact(Fact<?> fact);
+    boolean validateFact(Fact<?> fact, TreeLogger.Node parent);
 
-    default boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts) {
+    @Override
+    default boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger.Node parent) {
         var fact = facts.get(name());
         if (fact != null) {
-            return validateFact(fact);
+            return validateFact(fact, parent);
         }
 
         for (var rule: rules) {
             var isAboutPredicate = rule.conclusions().stream().anyMatch(f -> f.getName().equals(name()));
-            if (isAboutPredicate && rule.isTrue(rules, facts) && validateFact(facts.get(name()))) {
-                return true;
+            if (isAboutPredicate && rule.isTrue(rules, facts, parent)) {
+                return validateFact(facts.get(name()), parent);
             }
         }
 

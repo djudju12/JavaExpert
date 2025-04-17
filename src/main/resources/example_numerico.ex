@@ -41,49 +41,49 @@ REGRA "PRESENTE_NENE" (
   ENTAO "presente" = "fralda"
 )
 
-REGRA "MENINO" (
+REGRA "PRESENTE_MENINO" (
   SE    "fase_da_vida" = "crianca"
   E     "sexo" = "masculino"
   ENTAO "presente" = "carrinho"
 )
 
-REGRA "MENINA" (
+REGRA "PRESENTE_MENINA" (
   SE    "fase_da_vida" = "crianca"
   E     "sexo" = "feminino"
   ENTAO "presente" = "boneca"
 )
 
-REGRA "ADOLESCENTE_MASC" (
+REGRA "PRESENTE_ADOLESCENTE_MASC" (
   SE    "fase_da_vida" = "adolescente"
   E     "sexo" = "masculino"
   ENTAO "presente" = "memoria_ram"
 )
 
-REGRA "ADOLESCENTE_FEM" (
+REGRA "PRESENTE_ADOLESCENTE_FEM" (
   SE    "fase_da_vida" = "adolescente"
   E     "sexo" = "feminino"
   ENTAO "presente" = "iphone"
 )
 
-REGRA "ADULTO_MASC" (
+REGRA "PRESENTE_ADULTO_MASC" (
   SE    "fase_da_vida" = "adulto"
   E     "sexo" = "masculino"
   ENTAO "presente" = "cerveja"
 )
 
-REGRA "ADULTO_FEM" (
+REGRA "PRESENTE_ADULTO_FEM" (
   SE    "fase_da_vida" = "adulto"
   E     "sexo" = "feminino"
   ENTAO "presente" = "flores"
 )
 
-REGRA "IDOSO_MASC" (
+REGRA "PRESENTE_IDOSO_MASC" (
   SE    "fase_da_vida" = "idoso"
   E     "sexo" = "masculino"
   ENTAO "presente" = "avental_vovô"
 )
 
-REGRA "IDOSO_FEM" (
+REGRA "PRESENTE_IDOSO_FEM" (
   SE    "fase_da_vida" = "idoso"
   E     "sexo" = "feminino"
   ENTAO "presente" = "tapete_ioga"

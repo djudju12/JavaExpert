@@ -1,13 +1,16 @@
 package org.javaexpert.expert.predicate;
 
+import org.javaexpert.TreeLogger;
 import org.javaexpert.expert.fact.Fact;
 import org.javaexpert.expert.fact.NumericFact;
 
 public record NumericPredicate(
-    String name,
-    float value,
-    LogicOperator operator
+        String name,
+        int value,
+        LogicOperator operator
 ) implements SimplePredicate {
+
+    private final static TreeLogger logger = TreeLogger.instance();
 
     @Override
     public String toString() {
@@ -15,15 +18,18 @@ public record NumericPredicate(
     }
 
     @Override
-    public boolean validateFact(Fact<?> fact) {
+    public boolean validateFact(Fact<?> fact, TreeLogger.Node parent) {
         if (fact instanceof NumericFact numFact) {
-            return switch (operator()) {
+            var ret = switch (operator()) {
                 case EQ -> numFact.getValue() == value();
                 case GT -> numFact.getValue() > value();
                 case GTE -> numFact.getValue() >= value();
                 case LT -> numFact.getValue() < value();
                 case LTE -> numFact.getValue() <= value();
             };
+
+            logger.appendf(parent, "'%s': %s %s %s? %s", name(), numFact.getValue(), operator(), value(), ret ? "~>[VERDADEIRO]" : "~>[FALSO]");
+            return ret;
         } else {
             throw new RuntimeException("some inconsistency between facts and rules");
         }

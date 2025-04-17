@@ -34,7 +34,7 @@ REGRA "R4" (
 
 REGRA "R5" (
   SE    "durabilidade" = "baixa"
-  OU    "satisfacao_client" = "baixa"
+  OU    "satisfacao_cliente" = "baixa"
   ENTAO "qualidade_final" = "rejeitavel"
 )
 

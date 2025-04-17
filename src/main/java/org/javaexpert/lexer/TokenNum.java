@@ -1,19 +1,19 @@
 package org.javaexpert.lexer;
 
 public class TokenNum extends Token {
-    private final float value;
+    private final int value;
 
-    public TokenNum(Location location, float value) {
+    public TokenNum(Location location, int value) {
         super(location, TokenType.NUM);
         this.value = value;
     }
 
-    public float getValue() {
+    public int getValue() {
         return value;
     }
 
     @Override
     public String toString() {
-        return "(%s, %f)".formatted(getType(), value);
+        return "(%s, %d)".formatted(getType(), value);
     }
 }

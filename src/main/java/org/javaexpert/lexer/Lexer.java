@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.lang.Character.isSpaceChar;
 import static java.lang.Character.isWhitespace;
 import static org.javaexpert.Asserts.assertNotNull;
 import static org.javaexpert.Asserts.assertTrue;
@@ -128,7 +127,7 @@ public class Lexer {
                 if (t.startsWith("\"") && t.endsWith("\"")) {
                     yield Optional.of(new TokenStr(loc, t.substring(1, t.length() - 1)));
                 } else if (t.matches("^-?\\d+(\\.\\d+)?$")) {
-                    yield Optional.of(new TokenNum(loc, Float.parseFloat(t)));
+                    yield Optional.of(new TokenNum(loc, Integer.parseInt(t)));
                 }
 
                 throw new IllegalStateException("%s: Invalid token '%s'".formatted(loc, t));
