@@ -1,6 +1,5 @@
 package org.javaexpert.expert;
 
-import org.javaexpert.TreeLogger;
 import org.javaexpert.expert.fact.Fact;
 import org.javaexpert.expert.predicate.Predicate;
 

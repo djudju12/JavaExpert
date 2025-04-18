@@ -1,4 +1,4 @@
-package org.javaexpert;
+package org.javaexpert.expert;
 
 import java.util.ArrayList;
 import java.util.List;

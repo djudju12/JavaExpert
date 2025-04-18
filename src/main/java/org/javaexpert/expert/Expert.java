@@ -1,6 +1,5 @@
 package org.javaexpert.expert;
 
-import org.javaexpert.TreeLogger;
 import org.javaexpert.expert.attribute.Attribute;
 import org.javaexpert.expert.attribute.NumericAttribute;
 import org.javaexpert.expert.attribute.StringAttribute;

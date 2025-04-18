@@ -1,6 +1,6 @@
 package org.javaexpert.expert.predicate;
 
-import org.javaexpert.TreeLogger;
+import org.javaexpert.expert.TreeLogger;
 import org.javaexpert.expert.fact.Fact;
 
 public record StringPredicate(
