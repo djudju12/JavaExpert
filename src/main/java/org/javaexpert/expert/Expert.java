@@ -48,6 +48,10 @@ public class Expert {
         return new Parser(filePath).parse();
     }
 
+    public Map<String, Attribute> getAttributes() {
+        return attributes;
+    }
+
     public void clearMemory() {
         facts.clear();
         log.setLength(0);
@@ -89,6 +93,10 @@ public class Expert {
         } else {
             throw new IllegalStateException("invalid fact. Attribute '%s' is not a number or string".formatted(attrName));
         }
+    }
+
+    public void removeFact(String attrName) {
+        facts.remove(attrName);
     }
 
     private Set<Rule> conclusiveRules() {
@@ -253,6 +261,5 @@ public class Expert {
             return attributeName;
         }
     }
-
 
 }
