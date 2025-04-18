@@ -1,11 +1,14 @@
 package org.javaexpert.ui;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,10 +31,17 @@ public class Quiz implements ActionListener {
                 "What are your favorite programming languages?",
                 Set.of("Java", "Python", "JavaScript", "C++"),
                 (id, answer) -> System.out.printf("%d -> %s\n", id, answer)));
+
         cards.add(newQuestion(
                 "Hello",
                 Set.of("World", "Saylor"),
                 (id, answer) -> System.out.printf("%d -> %s\n", id, answer)
+        ));
+
+
+        cards.add(newQuestion(
+                "idade?",
+                (id, answer) -> System.out.printf("%d -> %d\n", id, answer)
         ));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -47,8 +57,12 @@ public class Quiz implements ActionListener {
         updateButtons();
     }
 
-    private Question newQuestion(String text, Set<String> options, OnQuestionAnswered onQuestionAnswered) {
-        return new Question(counter++, text, options, onQuestionAnswered);
+    private Question<Integer> newQuestion(String text, OnQuestionAnswered<Integer> onQuestionAnswered) {
+        return new NumericQuestion(counter++, text, onQuestionAnswered);
+    }
+
+    private Question<String> newQuestion(String text, Set<String> options, OnQuestionAnswered<String> onQuestionAnswered) {
+        return new OptionQuestion(counter++, text, options, onQuestionAnswered);
     }
 
     private void nextCard() {
@@ -81,39 +95,61 @@ public class Quiz implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         var cmd = e.getActionCommand();
-        if ("Anterior".equals(cmd)) {
-            previousCard();
-        } else {
-            nextCard();
-        }
-
+        if ("Anterior".equals(cmd)) previousCard();
+        else nextCard();
         updateButtons();
     }
 
     @FunctionalInterface
-    public interface OnQuestionAnswered {
+    public interface OnQuestionAnswered<T> { void apply(int id, T answer); }
 
-        void apply(int questionId, String answer);
+    static class NumericQuestion extends Question<Integer> {
 
+        private final JFormattedTextField field;
+
+        public NumericQuestion(int id, String text, OnQuestionAnswered<Integer> onQuestionAnswered) {
+            super(id, text, onQuestionAnswered);
+            var numPanel = new JPanel();
+            numPanel.setLayout(new BoxLayout(numPanel, BoxLayout.Y_AXIS));
+
+            var format = NumberFormat.getIntegerInstance();
+            format.setGroupingUsed(false);
+
+            var formatter = new NumberFormatter(format);
+            formatter.setValueClass(Integer.class);
+            formatter.setAllowsInvalid(false);
+            formatter.setMinimum(0);
+            formatter.setMaximum(Integer.MAX_VALUE);
+
+            field = new JFormattedTextField(formatter);
+            field.setColumns(10);
+            field.setMaximumSize(field.getPreferredSize());
+            field.addPropertyChangeListener("value", this::onValueChanged);
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.BLACK),
+                    BorderFactory.createEmptyBorder(2, 4, 2, 4)
+            ));
+
+            numPanel.add(field);
+            add(numPanel, BorderLayout.LINE_START);
+        }
+
+        public void onValueChanged(PropertyChangeEvent evt) {
+            var fieldValue = (Number) field.getValue();
+            if (fieldValue != null) {
+                onQuestionAnswered.apply(id, fieldValue.intValue());
+            }
+        }
     }
 
-    public static class Question extends JPanel implements ItemListener {
+    static class OptionQuestion extends Question<String> implements ItemListener {
 
-        private final int id;
-        private final OnQuestionAnswered onQuestionAnswered;
         private final List<JCheckBox> checkBoxes = new ArrayList<>();
 
-        public Question(int id, String text, Set<String> options,  OnQuestionAnswered onQuestionAnswered) {
-            super(new BorderLayout(20, 20));
-            this.id = id;
-            this.onQuestionAnswered = onQuestionAnswered;
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        OptionQuestion(int id, String text, Set<String> options, OnQuestionAnswered<String> onQuestionAnswered) {
+            super(id, text, onQuestionAnswered);
 
-            JLabel questionLabel = new JLabel(text);
-            questionLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            add(questionLabel, BorderLayout.NORTH);
-
-            JPanel checkBoxPanel = new JPanel();
+            var checkBoxPanel = new JPanel();
             checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
 
             options.forEach(opt -> {
@@ -144,13 +180,28 @@ public class Quiz implements ActionListener {
         }
     }
 
+    static abstract class Question<T> extends JPanel {
+
+        protected final int id;
+        protected final OnQuestionAnswered<T> onQuestionAnswered;
+
+        Question(int id, String text, OnQuestionAnswered<T> onQuestionAnswered) {
+            super(new BorderLayout(20, 20));
+            this.id = id;
+            this.onQuestionAnswered = onQuestionAnswered;
+            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            var questionLabel = new JLabel(text);
+            questionLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            add(questionLabel, BorderLayout.NORTH);
+        }
+    }
+
     public static void main(String[] args) {
         var frame = new JFrame("Quiz Example");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null); // Center the window
         frame.setResizable(false);
-        var quiz = new Quiz();
-        quiz.addComponentToPane(frame.getContentPane());
+        new Quiz().addComponentToPane(frame.getContentPane());
         frame.pack();
         frame.setVisible(true);
     }
