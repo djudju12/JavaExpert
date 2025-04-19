@@ -184,7 +184,7 @@ public class Quiz {
         }
     }
 
-    static abstract class Question extends JPanel {
+    abstract static class Question extends JPanel {
 
         protected final int id;
 
@@ -193,9 +193,9 @@ public class Quiz {
             this.id = id;
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             var questionLabel = new JLabel(text);
-            questionLabel.setFont(new Font("Arial", Font.BOLD, 16));
             add(questionLabel, BorderLayout.NORTH);
         }
+
     }
 
     public void createAndRunGUI() {

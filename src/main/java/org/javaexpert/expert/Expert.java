@@ -48,8 +48,9 @@ public class Expert {
         return new Parser(filePath).parse();
     }
 
-    public Map<String, Attribute> getAttributes() {
-        return attributes;
+    public Set<String> getAttributesValues(String attrName) {
+        if (attributes.get(attrName) instanceof StringAttribute strAttr) return strAttr.values();
+        throw new IllegalStateException("string attribute %s not found".formatted(attrName));
     }
 
     public void clearMemory() {
