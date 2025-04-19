@@ -2,17 +2,24 @@ package org.javaexpert;
 
 
 import org.javaexpert.expert.Expert;
+import org.javaexpert.expert.fact.Fact;
 import org.javaexpert.ui.Quiz;
+import org.javaexpert.ui.Result;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
+import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
+
 //        var quiz = simpleExample();
         var quiz = qualidadeProdutoExample();
 
@@ -48,11 +55,28 @@ public class Main {
             answers.forEach((id, attrValue) -> {
                 var attrName = questionsAttrs.get(id);
                 expert.newFact(attrName, attrValue);
-
             });
 
-            var rule = expert.think();
-            System.out.println(expert.print());
+            // TODO: fallback result when not found
+            // TODO: create some methods to facilitate this
+            expert.think()
+                .ifPresent(rule -> {
+                    var conclusions = new TreeMap<String, Object>();
+
+                    var qualidadeFinal = rule.conclusions()
+                            .stream()
+                            .filter(fact -> fact.getName().equals("qualidade_final"))
+                            .findFirst()
+                            .map(Fact::getValue)
+                            .map(Object::toString)
+                            .orElse("DESCONHECIDO");
+
+                    conclusions.put("Qualidade Final", qualidadeFinal);
+
+                    var hist = expert.print();
+                    var resultUi = new Result(quiz, conclusions, hist);
+                    resultUi.createAndShowGUI();
+                });
         });
 
 
@@ -74,7 +98,9 @@ public class Main {
 
         quiz.newQuestion("idade?");
 
-        quiz.onFinished(System.out::println);
+        quiz.onFinished(answers -> {
+
+        });
 
         return quiz;
     }

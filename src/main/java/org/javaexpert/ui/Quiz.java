@@ -20,11 +20,14 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 public class Quiz {
 
     private final JPanel cards = new JPanel(new CardLayout());
+    private final List<Question> questions = new ArrayList<>();
 
     private final JButton backButton = new JButton("Anterior");
     private final JButton nextButton = new JButton("Próximo");
 
     protected Map<Integer, Object> answers = new HashMap<>();
+
+    private JFrame frame;
 
     private int current = 0;
     private int counter = 0;
@@ -33,15 +36,25 @@ public class Quiz {
 
     public Quiz() { }
 
+    public void reset() {
+        questions.forEach(Question::reset);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
     public int newQuestion(String text) {
         var id = counter++;
-        cards.add(new NumericQuestion(id, text));
+        var question = new NumericQuestion(id, text);
+        questions.add(question);
+        cards.add(question);
         return id;
     }
 
     public int newQuestion(String text, Set<String> options) {
         var id = counter++;
-        cards.add(new OptionQuestion(id, text, options));
+        var question = new OptionQuestion(id, text, options);
+        questions.add(question);
+        cards.add(question);
         return id;
     }
 
@@ -76,8 +89,7 @@ public class Quiz {
             ((CardLayout)cards.getLayout()).next(cards);
         } else {
             whenFinished.accept(answers);
-            current = 0;
-            ((CardLayout)cards.getLayout()).first(cards);
+            frame.setVisible(false);
         }
     }
 
@@ -137,6 +149,11 @@ public class Quiz {
             add(numPanel, BorderLayout.LINE_START);
         }
 
+        @Override
+        void reset() {
+            field.setValue(null);
+        }
+
         public void onValueChanged(PropertyChangeEvent evt) {
             var fieldValue = Optional.ofNullable((Number) field.getValue())
                     .map(Number::intValue)
@@ -182,6 +199,11 @@ public class Quiz {
 
             answers.put(this.id, ((JCheckBox) e.getItem()).getText());
         }
+
+        @Override
+        void reset() {
+            checkBoxes.forEach(cb -> cb.setSelected(false));
+        }
     }
 
     abstract static class Question extends JPanel {
@@ -196,10 +218,12 @@ public class Quiz {
             add(questionLabel, BorderLayout.NORTH);
         }
 
+        abstract void reset();
     }
 
     public void createAndRunGUI() {
-        var frame = new JFrame("Quiz Example");
+        frame = new JFrame("Quiz");
+        answers.clear();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null); // Center the window
         frame.setResizable(false);

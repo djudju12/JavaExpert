@@ -18,7 +18,13 @@ public record CompoundPredicate(
         var a = lhs().isTrue(rules, facts, tree, parent);
         return switch (connector) {
             case AND -> (a && tree.appendf(parent, "%s...", connector) != null) && rhs().isTrue(rules, facts, tree, parent);
-            case OR -> (a || tree.appendf(parent, "%s...", connector) != null) || rhs().isTrue(rules, facts, tree, parent);
+            case OR -> {
+                if (!a) {
+                    tree.appendf(parent, "%s...", connector);
+                    yield rhs().isTrue(rules, facts, tree, parent);
+                }
+                yield true;
+            }
         };
     }
 

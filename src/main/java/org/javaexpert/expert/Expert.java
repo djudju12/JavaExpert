@@ -59,10 +59,8 @@ public class Expert {
     }
 
     public Optional<Rule> think() {
-        log.append("\n========================= JAVA EXPERT =========================\n");
-
         var tree = new TreeLogger();
-        var acceptedRule = conclusiveRules()
+        return conclusiveRules()
                 .stream()
                 .filter(rule -> {
                     if (rule.isTrue(new TreeSet<>(rules.values()), facts, tree)) {
@@ -74,9 +72,6 @@ public class Expert {
                     return false;
                 })
                 .findFirst();
-
-        log.append("\n========================= JAVA EXPERT =========================\n");
-        return acceptedRule;
     }
 
     public String print() {

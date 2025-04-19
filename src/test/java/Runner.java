@@ -15,7 +15,8 @@ public class Runner {
     public static void main(String[] args) throws IOException {
         var testCases = Set.of(
                 numerics(),
-                strings()
+                strings(),
+                qualidadeAceitavel()
         );
 
         var total = 0;
@@ -69,6 +70,20 @@ public class Runner {
                 .fact("materia_prima","baixa")
                 .fact("processo_fabricacao","ruim")
                 .ruleIs("R5")
+                .build();
+    }
+
+    private static TestCase qualidadeAceitavel() throws IOException {
+        var expert = Expert.fromFile("example.ex");
+
+        return TestCase.builder()
+                .expert(expert)
+                .testName("String values")
+                .fact("controle_qualidade","rigoroso")
+                .fact("acabamento","excelente")
+                .fact("materia_prima","alta")
+                .fact("processo_fabricacao","otimo")
+                .ruleIs("R6")
                 .build();
     }
 

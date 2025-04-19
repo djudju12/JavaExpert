@@ -29,6 +29,7 @@ public sealed interface SimplePredicate extends Predicate permits StringPredicat
             }
         }
 
+        tree.appendf(parent, "NÃO ENCONTROU '%s'!", name());
         return false;
     }
 

@@ -37,7 +37,7 @@ public class TreeLogger {
                 .orElse(0);
 
         for (var root: roots) {
-            lines.add(format("\n> %s", root.content()));
+            lines.add(format("> %s", root.content()));
             for (int i = 0; i < root.children().size(); i++) {
                 var isLast = i == root.children.size() - 1;
                 print(root.children().get(i), 0, isLast, maxSize);
@@ -48,6 +48,8 @@ public class TreeLogger {
                     }
                 }
             }
+
+            lines.add("");
         }
 
         return String.join("\n", lines);
