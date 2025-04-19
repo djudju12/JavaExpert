@@ -2,7 +2,6 @@ package org.javaexpert;
 
 
 import org.javaexpert.expert.Expert;
-import org.javaexpert.expert.fact.Fact;
 import org.javaexpert.ui.Quiz;
 import org.javaexpert.ui.Result;
 
@@ -59,24 +58,14 @@ public class Main {
 
             // TODO: fallback result when not found
             // TODO: create some methods to facilitate this
-            expert.think()
-                .ifPresent(rule -> {
-                    var conclusions = new TreeMap<String, Object>();
+            expert.think();
+            var conclusions = new TreeMap<String, Object>();
+            expert.getFacts()
+                    .forEach(fact -> conclusions.put(fact.getName(), fact.getValue()));
 
-                    var qualidadeFinal = rule.conclusions()
-                            .stream()
-                            .filter(fact -> fact.getName().equals("qualidade_final"))
-                            .findFirst()
-                            .map(Fact::getValue)
-                            .map(Object::toString)
-                            .orElse("DESCONHECIDO");
-
-                    conclusions.put("Qualidade Final", qualidadeFinal);
-
-                    var hist = expert.print();
-                    var resultUi = new Result(quiz, conclusions, hist);
-                    resultUi.createAndShowGUI();
-                });
+            var hist = expert.print();
+            var resultUi = new Result(quiz, conclusions, expert.getObjectives(), hist);
+            resultUi.createAndShowGUI();
         });
 
 

@@ -6,6 +6,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.util.Map;
+import java.util.Set;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -15,19 +16,27 @@ public class Result {
     private final JFrame frame;
     private final String hist;
     private final Map<String, Object> conclusions; // attrName -> attrValue
+    private final Set<String> objectives;
 
-    public Result(Quiz quiz, Map<String, Object> conclusions, String hist) {
+    public Result(Quiz quiz, Map<String, Object> conclusions, Set<String> objectives, String hist) {
         this.quiz = quiz;
         this.conclusions = conclusions;
         this.hist = hist;
+        this.objectives = objectives;
         this.frame = new JFrame("Resumo");
     }
 
     private void addComponentToPane(Container pane) {
         var tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.addTab("Conclusões", makeMapPanel(conclusions));
+        tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives, conclusions)));
+        tabbedPane.addTab("Resultados", makeMapPanel(parseMap(conclusions)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
 
+        pane.add(makeMenuBar(), BorderLayout.NORTH);
+        pane.add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    private JMenuBar makeMenuBar() {
         var menuBar = new JMenuBar();
         var menu = new JMenu("Nova");
         menu.addMenuListener(new MenuListener() {
@@ -46,22 +55,12 @@ public class Result {
 
         menuBar.add(menu);
         menuBar.setBorder(new MatteBorder(0, 0, 10, 0, menuBar.getBackground()));
-
-        pane.add(menuBar, BorderLayout.NORTH);
-        pane.add(tabbedPane, BorderLayout.CENTER);
+        return menuBar;
     }
 
-    protected JComponent makeMapPanel(Map<String, Object> map) {
+    protected JComponent makeMapPanel(Object[][] data) {
         var panel = new JPanel();
         panel.setLayout(new BorderLayout());
-
-        var data = new Object[map.size()][2];
-        int i = 0;
-        for (var entry: map.entrySet()) {
-            data[i][0] = entry.getKey();
-            data[i][1] = entry.getValue();
-            i += 1;
-        }
 
         var columns = new String[] { "Atributo", "Valor" };
         var table = new JTable(data, columns);
@@ -81,7 +80,29 @@ public class Result {
         return panel;
     }
 
-    protected JComponent makeTextPanel(String text) {
+    private static Object[][] parseMap(Set<String> includes, Map<String, Object> map) {
+        var data = new Object[includes.size()][2];
+        int i = 0;
+        for (var attr: includes) {
+            data[i][0] = attr;
+            data[i][1] = map.get(attr);
+            i += 1;
+        }
+        return data;
+    }
+
+    private static Object[][] parseMap(Map<String, Object> map) {
+        var data = new Object[map.size()][2];
+        int i = 0;
+        for (var key: map.keySet()) {
+            data[i][0] = key;
+            data[i][1] = map.get(key);
+            i += 1;
+        }
+        return data;
+    }
+
+    private JComponent makeTextPanel(String text) {
         var panel = new JPanel();
         panel.setLayout(new BorderLayout());
 

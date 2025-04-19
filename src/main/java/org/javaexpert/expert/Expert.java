@@ -18,6 +18,7 @@ import org.javaexpert.lexer.TokenNum;
 import org.javaexpert.lexer.TokenStr;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -46,6 +47,14 @@ public class Expert {
 
     public static Expert fromFile(String filePath) throws IOException {
         return new Parser(filePath).parse();
+    }
+
+    public Set<String> getObjectives() {
+        return objectives;
+    }
+
+    public Collection<Fact<?>> getFacts() {
+        return facts.values();
     }
 
     public Set<String> getAttributesValues(String attrName) {

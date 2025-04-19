@@ -225,10 +225,10 @@ public class Quiz {
         frame = new JFrame("Quiz");
         answers.clear();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null); // Center the window
         frame.setResizable(false);
         addComponentToPane(frame.getContentPane());
         frame.pack();
+        frame.setLocationRelativeTo(null); // Center the window
         frame.setVisible(true);
     }
 }
