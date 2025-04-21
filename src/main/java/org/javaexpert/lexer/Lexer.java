@@ -34,6 +34,10 @@ public class Lexer {
         cursor = 0;
     }
 
+    public String getContent() {
+        return content;
+    }
+
     private Character peekChar() {
         if (cursor >= content.length()) {
             return content.charAt(cursor - 1);

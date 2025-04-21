@@ -1,6 +1,5 @@
 package org.javaexpert.expert.predicate;
 
-import org.javaexpert.expert.TreeLogger;
 import org.javaexpert.expert.fact.Fact;
 
 public record StringPredicate(
@@ -15,15 +14,7 @@ public record StringPredicate(
     }
 
     @Override
-    public boolean validateFact(Fact<?> fact, TreeLogger tree, TreeLogger.Node parent) {
-        var ret =  value().equals(fact.getValue());
-
-        tree.appendf(
-                parent,
-                "'%s': '%s' %s '%s'? %s",
-                name(), fact.getValue(), operator(), value(),
-                ret ? "~>[VERDADEIRO]" : "~>[FALSO]"
-        );
-        return ret;
+    public boolean validateFact(Fact<?> fact) {
+        return value().equals(fact.getValue());
     }
 }

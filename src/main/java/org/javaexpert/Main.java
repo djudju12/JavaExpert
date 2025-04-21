@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main2(String[] args) throws IOException {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
@@ -56,8 +56,6 @@ public class Main {
                 expert.newFact(attrName, attrValue);
             });
 
-            // TODO: fallback result when not found
-            // TODO: create some methods to facilitate this
             expert.think();
             var conclusions = new TreeMap<String, Object>();
             expert.getFacts()

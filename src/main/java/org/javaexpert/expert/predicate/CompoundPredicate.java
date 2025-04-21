@@ -1,31 +1,7 @@
 package org.javaexpert.expert.predicate;
 
-import org.javaexpert.expert.TreeLogger;
-import org.javaexpert.expert.Rule;
-import org.javaexpert.expert.fact.Fact;
-
-import java.util.Map;
-import java.util.Set;
-
 public record CompoundPredicate(
         Predicate lhs,
         Predicate rhs,
         LogicConnector connector
-) implements Predicate {
-
-    @Override
-    public boolean isTrue(Set<Rule> rules, Map<String, Fact<?>> facts, TreeLogger tree, TreeLogger.Node parent) {
-        var a = lhs().isTrue(rules, facts, tree, parent);
-        return switch (connector) {
-            case AND -> (a && tree.appendf(parent, "%s...", connector) != null) && rhs().isTrue(rules, facts, tree, parent);
-            case OR -> {
-                if (!a) {
-                    tree.appendf(parent, "%s...", connector);
-                    yield rhs().isTrue(rules, facts, tree, parent);
-                }
-                yield true;
-            }
-        };
-    }
-
-}
+) implements Predicate { }

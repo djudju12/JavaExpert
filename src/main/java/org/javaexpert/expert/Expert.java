@@ -10,6 +10,7 @@ import org.javaexpert.expert.predicate.CompoundPredicate;
 import org.javaexpert.expert.predicate.LogicOperator;
 import org.javaexpert.expert.predicate.NumericPredicate;
 import org.javaexpert.expert.predicate.Predicate;
+import org.javaexpert.expert.predicate.SimplePredicate;
 import org.javaexpert.expert.predicate.StringPredicate;
 import org.javaexpert.lexer.Lexer;
 import org.javaexpert.lexer.Token;
@@ -19,6 +20,7 @@ import org.javaexpert.lexer.TokenStr;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -38,11 +40,13 @@ public class Expert {
     private final Set<String> objectives;
     private final Map<String, Fact<?>> facts = new TreeMap<>();
     private final StringBuilder log = new StringBuilder();
+    private final TreeLogger tree;
 
     protected Expert(Map<String, Attribute> attrs, Map<String, Rule> rules, Set<String> objectives) {
         this.rules = rules;
         this.attributes = attrs;
         this.objectives = objectives;
+        tree = new TreeLogger();
     }
 
     public static Expert fromFile(String filePath) throws IOException {
@@ -72,7 +76,7 @@ public class Expert {
         return conclusiveRules()
                 .stream()
                 .filter(rule -> {
-                    if (rule.isTrue(new TreeSet<>(rules.values()), facts, tree)) {
+                    if (verifyRule(rule, new TreeSet<>(rules.values()), null)) {
                         log.append(tree.print());
                         log.append(format("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name()));
                         return true;
@@ -81,6 +85,82 @@ public class Expert {
                     return false;
                 })
                 .findFirst();
+    }
+
+    public boolean verifyPredicate(Predicate predicate, Set<Rule> rules, TreeLogger.Node parent) {
+        return switch (predicate) {
+            case CompoundPredicate compound -> verifyCompoundPredicate(compound, rules, parent);
+            case SimplePredicate simple -> {
+                var isTrue = verifySimplePredicate(simple, rules, parent);
+                tree.appendf(parent, "'%s' %s '%s'? %s", simple.name(), simple.operator(), simple.value(),
+                        isTrue ? "~>[VERDADEIRO]" : "~>[FALSO]");
+                yield isTrue;
+            }
+        };
+    }
+
+    private boolean verifySimplePredicate(SimplePredicate simple, Set<Rule> rules, TreeLogger.Node parent) {
+        var fact = facts.get(simple.name());
+        if (fact != null) {
+            return simple.validateFact(fact);
+        }
+
+        var child = tree.appendf(parent, "PROCURANDO '%s'...", simple.name());
+        if (searchFactInRules(simple, rules, child)) {
+            return simple.validateFact(facts.get(simple.name()));
+        }
+
+        tree.appendf(parent, "NÃO ENCONTROU '%s'!", simple.name());
+
+        // ask question
+
+        return simple.validateFact(facts.get(simple.name()));
+    }
+
+    private boolean searchFactInRules(SimplePredicate simple, Set<Rule> rules, TreeLogger.Node parent) {
+        for (var rule: rules) {
+            var isAboutPredicate = rule.conclusions()
+                    .stream()
+                    .anyMatch(f -> f.getName().equals(simple.name()));
+
+            if (isAboutPredicate && verifyRule(rule, rules, parent)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean verifyCompoundPredicate(CompoundPredicate compound, Set<Rule> rules, TreeLogger.Node parent) {
+        var a = verifyPredicate(compound.lhs(), rules, parent);
+        return switch (compound.connector()) {
+            case AND -> (a && tree.appendf(parent, "%s...", compound.connector()) != null) && verifyPredicate(compound.rhs(), rules, parent);
+            case OR -> {
+                if (!a) {
+                    tree.appendf(parent, "%s...", compound.connector());
+                    yield verifyPredicate(compound.rhs(), rules, parent);
+                }
+                yield true;
+            }
+        };
+    }
+
+    public boolean verifyRule(Rule rule, Set<Rule> notCheckedRules, TreeLogger.Node parent) {
+        var child = tree.appendf(parent, "ENTRANDO NA REGRA '%s':", rule.name());
+        var otherRules = notCheckedRules.stream().filter(other -> !other.equals(rule)).collect(Collectors.toSet());
+        var isRuleTrue =  verifyPredicate(rule.predicate(), otherRules, child);
+        if (isRuleTrue) {
+            var then = tree.appendf(child, "REGRA '%s' APLICADA", rule.name());
+            rule.conclusions().forEach(f -> {
+                tree.appendf(then, "'%s' := '%s'", f.getName(), f.getValue());
+                facts.putIfAbsent(f.getName(), f);
+            });
+
+        } else {
+            tree.appendf(child, "REGRA '%s' NÃO APLICADA", rule.name());
+        }
+
+        return isRuleTrue;
     }
 
     public String print() {
@@ -104,14 +184,14 @@ public class Expert {
         facts.remove(attrName);
     }
 
-    private Set<Rule> conclusiveRules() {
+    private List<Rule> conclusiveRules() {
         return rules.values()
             .stream()
             .filter(rule -> {
                 var conclusionNames = rule.conclusions().stream().map(Fact::getName).collect(Collectors.toSet());
                 return conclusionNames.stream().anyMatch(objectives::contains);
             })
-            .collect(Collectors.toCollection(TreeSet::new));
+            .toList();
     }
 
     private static class Parser {
