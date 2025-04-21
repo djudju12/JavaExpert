@@ -15,11 +15,10 @@ import java.util.TreeMap;
 
 public class Main {
 
-    public static void main2(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
-//        var quiz = simpleExample();
         var quiz = qualidadeProdutoExample();
 
         quiz.createAndRunGUI();
@@ -51,6 +50,8 @@ public class Main {
         ), "processo_fabricacao");
 
         quiz.onFinished((answers) -> {
+            expert.clearMemory();
+
             answers.forEach((id, attrValue) -> {
                 var attrName = questionsAttrs.get(id);
                 expert.newFact(attrName, attrValue);

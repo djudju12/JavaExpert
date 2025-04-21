@@ -68,11 +68,11 @@ public class Expert {
 
     public void clearMemory() {
         facts.clear();
-        log.setLength(0);
     }
 
     public Optional<Rule> think() {
-        var tree = new TreeLogger();
+        tree.clear();
+        log.setLength(0);
         return conclusiveRules()
                 .stream()
                 .filter(rule -> {
@@ -113,8 +113,7 @@ public class Expert {
         tree.appendf(parent, "NÃO ENCONTROU '%s'!", simple.name());
 
         // ask question
-
-        return simple.validateFact(facts.get(simple.name()));
+        return false;
     }
 
     private boolean searchFactInRules(SimplePredicate simple, Set<Rule> rules, TreeLogger.Node parent) {

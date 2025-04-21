@@ -18,6 +18,11 @@ public class TreeLogger {
         return append(parent, format(fmt, objects));
     }
 
+    public void clear() {
+        roots.clear();
+        lines.clear();
+    }
+
     public Node append(Node parent, String content) {
         var node = new Node(content, parent, counter++);
         if (parent == null) {

@@ -30,7 +30,6 @@ public class Quiz {
     private JFrame frame;
 
     private int current = 0;
-    private boolean currentAnswered = false;
     private int counter = 0;
 
     private Consumer<Map<Integer, Object>> whenFinished;
@@ -39,8 +38,12 @@ public class Quiz {
 
     public void reset() {
         questions.forEach(Question::reset);
+        answers.clear();
+        current = 0;
+        ((CardLayout)cards.getLayout()).first(cards);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        updateButtons();
     }
 
     public int newQuestion(String text) {
