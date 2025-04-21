@@ -30,6 +30,7 @@ public class Quiz {
     private JFrame frame;
 
     private int current = 0;
+    private boolean currentAnswered = false;
     private int counter = 0;
 
     private Consumer<Map<Integer, Object>> whenFinished;
@@ -110,7 +111,7 @@ public class Quiz {
 
     private void updateButtons() {
         backButton.setEnabled(notInFirstCard());
-
+        nextButton.setEnabled(answers.get(current) != null);
         if (inLastCard()) {
             nextButton.setText("Finalizar");
         } else {
@@ -160,6 +161,7 @@ public class Quiz {
                     .orElse(null);
 
             answers.put(this.id, fieldValue);
+            updateButtons();
         }
     }
 
@@ -187,17 +189,18 @@ public class Quiz {
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.DESELECTED) {
                 answers.put(this.id, null);
-                return;
-            }
-
-            for (var cb: checkBoxes) {
-                var selectedCb = e.getItemSelectable();
-                if (cb != selectedCb && cb.isSelected()) {
-                    cb.setSelected(false);
+            } else {
+                for (var cb: checkBoxes) {
+                    var selectedCb = e.getItemSelectable();
+                    if (cb != selectedCb && cb.isSelected()) {
+                        cb.setSelected(false);
+                    }
                 }
+
+                answers.put(this.id, ((JCheckBox) e.getItem()).getText());
             }
 
-            answers.put(this.id, ((JCheckBox) e.getItem()).getText());
+            updateButtons();
         }
 
         @Override
