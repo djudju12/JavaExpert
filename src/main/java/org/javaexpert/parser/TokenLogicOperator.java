@@ -1,4 +1,4 @@
-package org.javaexpert.lexer;
+package org.javaexpert.parser;
 
 import org.javaexpert.expert.predicate.LogicOperator;
 

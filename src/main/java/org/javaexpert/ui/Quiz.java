@@ -51,11 +51,11 @@ public class Quiz {
     }
 
     public void runGui() {
+        resetState();
         if (frame == null) {
             frame = createFrame();
         }
 
-        resetState();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }

@@ -1,4 +1,4 @@
-package org.javaexpert.lexer;
+package org.javaexpert.parser;
 
 public record Location (String filePath, int row, int col) {
     @Override

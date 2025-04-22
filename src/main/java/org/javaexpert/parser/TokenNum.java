@@ -1,4 +1,4 @@
-package org.javaexpert.lexer;
+package org.javaexpert.parser;
 
 public class TokenNum extends Token {
     private final int value;

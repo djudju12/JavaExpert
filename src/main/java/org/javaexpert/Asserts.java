@@ -1,6 +1,6 @@
 package org.javaexpert;
 
-import org.javaexpert.lexer.Location;
+import org.javaexpert.parser.Location;
 
 public class Asserts {
 

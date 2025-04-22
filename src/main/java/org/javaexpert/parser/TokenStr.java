@@ -1,4 +1,4 @@
-package org.javaexpert.lexer;
+package org.javaexpert.parser;
 
 public class TokenStr extends Token {
     private final String value;
