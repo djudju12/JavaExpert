@@ -17,7 +17,18 @@ public class Main {
         setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
 //        qualidadeProdutoExample();
-        presenteExample();
+//        presenteExample();
+        exemplAula();
+    }
+
+    private static void exemplAula() throws IOException {
+        var manager = new QuizManager(Expert.fromFile("examplo_aula.ex"));
+        manager.addMultiOptionsQuestion("Você tem episódios de lapsos de memória?", "Lapsos");
+        manager.addMultiOptionsQuestion("Quando você descreve suas lembranças, qual o nível de detalhamento?", "Lembranças");
+        manager.addMultiOptionsQuestion("Como estão os movimentos do seu diafragma?", "Movimentos");
+        manager.addMultiOptionsQuestion("Como está a sua respiração?", "Respiração");
+        manager.addMultiOptionsQuestion("Como está a sua tosse?", "Tosse");
+        manager.runQuiz();
     }
 
     private static void presenteExample() throws IOException {
