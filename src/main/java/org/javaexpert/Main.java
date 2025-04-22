@@ -16,17 +16,23 @@ public class Main {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
-        qualidadeProdutoExample();
+//        qualidadeProdutoExample();
+        presenteExample();
+    }
 
-//        quiz.createAndRunGUI();
+    private static void presenteExample() throws IOException {
+        var manager = new QuizManager(Expert.fromFile("example_numerico.ex"));
+        manager.addNumericQuestion("Qual a idade do aniversariante?", "idade");
+        manager.addMultiOptionsQuestion("Qual é o sexo do aniversáriante?", "sexo");
+        manager.runQuiz();
     }
 
     private static void qualidadeProdutoExample() throws IOException {
         var manager = new QuizManager(Expert.fromFile("example.ex"));
-        manager.addQuestion("Como foi o controle de qualidade?", "controle_qualidade");
-        manager.addQuestion("Como está o acabamento do produto?", "acabamento");
-        manager.addQuestion("Qual a qualidade da materia prima?", "materia_prima");
-        manager.addQuestion("Qual o nível do processo de fabricação?", "processo_fabricacao");
+        manager.addMultiOptionsQuestion("Como foi o controle de qualidade?", "controle_qualidade");
+        manager.addMultiOptionsQuestion("Como está o acabamento do produto?", "acabamento");
+        manager.addMultiOptionsQuestion("Qual a qualidade da materia prima?", "materia_prima");
+        manager.addMultiOptionsQuestion("Qual o nível do processo de fabricação?", "processo_fabricacao");
 
         manager.runQuiz();
     }
@@ -63,7 +69,12 @@ public class Main {
 
         }
 
-        public void addQuestion(String text, String attr) {
+        public void addNumericQuestion(String text, String attr) {
+            expert.addAskable(attr);
+            quiz.newQuestion(attr, text);
+        }
+
+        public void addMultiOptionsQuestion(String text, String attr) {
             expert.addAskable(attr);
             quiz.newQuestion(attr, text, expert.getAttributesValues(attr));
         }

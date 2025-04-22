@@ -70,7 +70,6 @@ public class Quiz {
     }
 
     private void resetState() {
-        questions.forEach(Question::reset);
         answers.clear();
         hist.clear();
         if (firstQuestion == null) {
@@ -80,6 +79,7 @@ public class Quiz {
         hist.add(firstQuestion);
         current = 0;
         showCurrentCard();
+        questions.forEach(Question::reset);
         updateButtons();
     }
 
@@ -143,7 +143,9 @@ public class Quiz {
 
     private void updateButtons() {
         backButton.setEnabled(notInFirstCard());
-        nextButton.setEnabled(answers.get(hist.get(current)) != null);
+        if (current < hist.size()) {
+            nextButton.setEnabled(answers.get(hist.get(current)) != null);
+        }
     }
 
     public void onQuestionAsnwered(BiFunction<String, Object, String> function) {
@@ -183,7 +185,7 @@ public class Quiz {
 
         @Override
         void reset() {
-            field.setValue(null);
+            field.setValue(0);
         }
 
         public void onValueChanged(PropertyChangeEvent evt) {
