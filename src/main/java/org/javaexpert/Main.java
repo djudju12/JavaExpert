@@ -9,9 +9,6 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class Main {
 
@@ -19,78 +16,19 @@ public class Main {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
-        var quiz = qualidadeProdutoExample();
+        qualidadeProdutoExample();
 
-        quiz.createAndRunGUI();
+//        quiz.createAndRunGUI();
     }
 
-    private static Quiz qualidadeProdutoExample() throws IOException {
-        var quiz = new Quiz();
-        var expert = Expert.fromFile("example.ex");
-        var questionsAttrs = new HashMap<Integer, String>();
+    private static void qualidadeProdutoExample() throws IOException {
+        var manager = new QuizManager(Expert.fromFile("example.ex"));
+        manager.addQuestion("Como foi o controle de qualidade?", "controle_qualidade");
+        manager.addQuestion("Como está o acabamento do produto?", "acabamento");
+        manager.addQuestion("Qual a qualidade da materia prima?", "materia_prima");
+        manager.addQuestion("Qual o nível do processo de fabricação?", "processo_fabricacao");
 
-        questionsAttrs.put(quiz.newQuestion(
-            "Como foi o controle de qualidade?",
-            expert.getAttributesValues("controle_qualidade")
-        ), "controle_qualidade");
-
-        questionsAttrs.put(quiz.newQuestion(
-            "Como está o acabamento do produto?",
-            expert.getAttributesValues("acabamento")
-        ), "acabamento");
-
-        questionsAttrs.put(quiz.newQuestion(
-            "Qual a qualidade da materia prima?",
-            expert.getAttributesValues("materia_prima")
-        ), "materia_prima");
-
-        questionsAttrs.put(quiz.newQuestion(
-            "Qual o nível do processo de fabricação?",
-            expert.getAttributesValues("processo_fabricacao")
-        ), "processo_fabricacao");
-
-        quiz.onFinished((answers) -> {
-            expert.clearMemory();
-
-            answers.forEach((id, attrValue) -> {
-                var attrName = questionsAttrs.get(id);
-                expert.newFact(attrName, attrValue);
-            });
-
-            expert.think();
-            var conclusions = new TreeMap<String, Object>();
-            expert.getFacts()
-                    .forEach(fact -> conclusions.put(fact.getName(), fact.getValue()));
-
-            var hist = expert.print();
-            var resultUi = new Result(quiz, conclusions, expert.getObjectives(), hist);
-            resultUi.createAndShowGUI();
-        });
-
-
-        return quiz;
-    }
-
-    private static Quiz simpleExample() {
-        var quiz = new Quiz();
-
-        quiz.newQuestion(
-            "What are your favorite programming languages?",
-            Set.of("Java", "Python", "JavaScript", "C++")
-        );
-
-        quiz.newQuestion(
-            "Hello",
-            Set.of("World", "Saylor")
-        );
-
-        quiz.newQuestion("idade?");
-
-        quiz.onFinished(answers -> {
-
-        });
-
-        return quiz;
+        manager.runQuiz();
     }
 
     public static void setUIFont(FontUIResource f){
@@ -100,6 +38,55 @@ public class Main {
             var value = UIManager.get (key);
             if (value instanceof FontUIResource)
                 UIManager.put(key, f);
+        }
+    }
+
+    private static class QuizManager {
+        private final Expert expert;
+        private final Quiz quiz;
+
+        private QuizManager(Expert expert) {
+            this.expert = expert;
+            this.quiz = new Quiz();
+
+            quiz.onQuestionAsnwered((id, answer) -> {
+                if (answer == null) return id;
+                expert.newFact(id, answer);
+                var questionOpt = expert.thinkIfNotConclusiveAskQuestion();
+                if (questionOpt.isEmpty()) {
+                    runResult();
+                    return null;
+                }
+
+                return questionOpt.get();
+            });
+
+        }
+
+        public void addQuestion(String text, String attr) {
+            expert.addAskable(attr);
+            quiz.newQuestion(attr, text, expert.getAttributesValues(attr));
+        }
+
+        private void runResult() {
+            var result = new Result(quiz, expert.getFacts(), expert.getObjectivesConclusions(), expert.print());
+            result.onNew(() -> {
+                result.close();
+                expert.clearMemory();
+                runQuiz();
+            });
+
+            result.createAndShowGUI();
+        }
+
+        public void runQuiz() {
+            var firstQuestionOpt = expert.thinkIfNotConclusiveAskQuestion();
+            if (firstQuestionOpt.isPresent()) {
+                quiz.setFirstQuestion(firstQuestionOpt.get());
+                quiz.runGui();
+            } else {
+                runResult();
+            }
         }
     }
 }

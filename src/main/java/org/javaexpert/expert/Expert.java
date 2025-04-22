@@ -19,7 +19,8 @@ import org.javaexpert.lexer.TokenNum;
 import org.javaexpert.lexer.TokenStr;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +42,8 @@ public class Expert {
     private final Map<String, Fact<?>> facts = new TreeMap<>();
     private final StringBuilder log = new StringBuilder();
     private final TreeLogger tree;
+    private String question = null;
+    private final Set<String> askableAttrs = new HashSet<>();
 
     protected Expert(Map<String, Attribute> attrs, Map<String, Rule> rules, Set<String> objectives) {
         this.rules = rules;
@@ -53,12 +56,20 @@ public class Expert {
         return new Parser(filePath).parse();
     }
 
-    public Set<String> getObjectives() {
-        return objectives;
+    public Map<String, Object> getFacts() {
+        return facts.values()
+                .stream()
+                .collect(Collectors.toMap(Fact::getName, Fact::getValue));
     }
 
-    public Collection<Fact<?>> getFacts() {
-        return facts.values();
+    public Map<String, Object> getObjectivesConclusions() {
+        var m = new HashMap<String, Object>(objectives.size());
+        objectives.forEach(o -> m.put(o, unwrapFactValue(facts.get(o))));
+        return m;
+    }
+
+    private static Object unwrapFactValue(Fact<?> fact) {
+        return fact == null? "DESCONHECIDO" : fact.getValue();
     }
 
     public Set<String> getAttributesValues(String attrName) {
@@ -66,8 +77,50 @@ public class Expert {
         throw new IllegalStateException("string attribute %s not found".formatted(attrName));
     }
 
+    public void addAskable(String attr) {
+        askableAttrs.add(attr);
+    }
+
+    private void clearLog() {
+        tree.clear();
+        log.setLength(0);
+    }
+
     public void clearMemory() {
         facts.clear();
+    }
+
+    private void clearNotAskableFacts() {
+        facts.keySet().removeIf(k -> !askableAttrs.contains(k));
+    }
+
+    public Optional<String> thinkIfNotConclusiveAskQuestion() {
+        // devido ao fato deste metodo ser invocado `n` vezes, ate encontrar um resultado, precisamos recalcular em cada
+        // chamada as regras intermediarias, pois os valores usados para valida-las podem ter sido alterados
+        clearNotAskableFacts();
+
+        clearLog();
+        var conclusiveRules = conclusiveRules();
+        for (var rule: conclusiveRules) {
+            if (verifyRule(rule, new TreeSet<>(rules.values()), null)) {
+                log.append(tree.print());
+                log.append(format("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name()));
+                return Optional.empty();
+            }
+
+            if (question != null) {
+                log.append(tree.print());
+                log.append("\n>>>>> NENHUMA REGRA ENCONTRADA <<<<<\n");
+                var ret = Optional.of(question);
+                question = null;
+                return ret;
+            }
+        }
+
+        log.append(tree.print());
+        log.append("\n>>>>> NENHUMA REGRA ENCONTRADA <<<<<\n");
+
+        return Optional.empty();
     }
 
     public Optional<Rule> think() {
@@ -87,7 +140,7 @@ public class Expert {
                 .findFirst();
     }
 
-    public boolean verifyPredicate(Predicate predicate, Set<Rule> rules, TreeLogger.Node parent) {
+    private boolean verifyPredicate(Predicate predicate, Set<Rule> rules, TreeLogger.Node parent) {
         return switch (predicate) {
             case CompoundPredicate compound -> verifyCompoundPredicate(compound, rules, parent);
             case SimplePredicate simple -> {
@@ -112,7 +165,10 @@ public class Expert {
 
         tree.appendf(parent, "NÃO ENCONTROU '%s'!", simple.name());
 
-        // ask question
+        if (question == null && askableAttrs.contains(simple.name())) {
+            question = simple.name();
+        }
+
         return false;
     }
 
@@ -177,10 +233,6 @@ public class Expert {
         } else {
             throw new IllegalStateException("invalid fact. Attribute '%s' is not a number or string".formatted(attrName));
         }
-    }
-
-    public void removeFact(String attrName) {
-        facts.remove(attrName);
     }
 
     private List<Rule> conclusiveRules() {

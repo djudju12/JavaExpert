@@ -6,7 +6,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.util.Map;
-import java.util.Set;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -15,21 +14,27 @@ public class Result {
     private final Quiz quiz;
     private final JFrame frame;
     private final String hist;
-    private final Map<String, Object> conclusions; // attrName -> attrValue
-    private final Set<String> objectives;
+    private final Map<String, Object> allFacts; // attrName -> attrValue
+    private final Map<String, Object> objectives; // attrName -> attrValue
 
-    public Result(Quiz quiz, Map<String, Object> conclusions, Set<String> objectives, String hist) {
+    private Runnable onNewFn;
+
+    public Result(Quiz quiz, Map<String, Object> allFacts, Map<String, Object> objectives, String hist) {
         this.quiz = quiz;
-        this.conclusions = conclusions;
-        this.hist = hist;
+        this.allFacts = allFacts;
         this.objectives = objectives;
+        this.hist = hist;
         this.frame = new JFrame("Resumo");
+    }
+
+    public void onNew(Runnable fn) {
+        this.onNewFn = fn;
     }
 
     private void addComponentToPane(Container pane) {
         var tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives, conclusions)));
-        tabbedPane.addTab("Resultados", makeMapPanel(parseMap(conclusions)));
+        tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives)));
+        tabbedPane.addTab("Resultados", makeMapPanel(parseMap(allFacts)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
 
         pane.add(makeMenuBar(), BorderLayout.NORTH);
@@ -42,7 +47,8 @@ public class Result {
         menu.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent e) {
-                quiz.reset();
+                onNewFn.run();
+                quiz.runGui();
                 frame.dispose();
             }
 
@@ -80,17 +86,6 @@ public class Result {
         return panel;
     }
 
-    private static Object[][] parseMap(Set<String> includes, Map<String, Object> map) {
-        var data = new Object[includes.size()][2];
-        int i = 0;
-        for (var attr: includes) {
-            data[i][0] = attr;
-            data[i][1] = map.get(attr);
-            i += 1;
-        }
-        return data;
-    }
-
     private static Object[][] parseMap(Map<String, Object> map) {
         var data = new Object[map.size()][2];
         int i = 0;
@@ -119,6 +114,10 @@ public class Result {
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    public void close() {
+        frame.dispose();
     }
 
     public void createAndShowGUI() {

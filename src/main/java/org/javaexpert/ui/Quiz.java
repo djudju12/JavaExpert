@@ -13,57 +13,74 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Quiz {
+    private JFrame frame;
 
     private final JPanel cards = new JPanel(new CardLayout());
     private final List<Question> questions = new ArrayList<>();
-
     private final JButton backButton = new JButton("Anterior");
     private final JButton nextButton = new JButton("Próximo");
 
-    protected Map<Integer, Object> answers = new HashMap<>();
-
-    private JFrame frame;
-
+    private String firstQuestion;
+    private final Map<String, Object> answers = new HashMap<>();
+    private final List<String> hist = new ArrayList<>();
     private int current = 0;
-    private int counter = 0;
 
-    private Consumer<Map<Integer, Object>> whenFinished;
+    private BiFunction<String, Object, String> onQuestionAnswered;
 
     public Quiz() { }
 
-    public void reset() {
-        questions.forEach(Question::reset);
-        answers.clear();
-        current = 0;
-        ((CardLayout)cards.getLayout()).first(cards);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        updateButtons();
+    public void setFirstQuestion(String question) {
+        firstQuestion = question;
     }
 
-    public int newQuestion(String text) {
-        var id = counter++;
+    public void newQuestion(String id, String text) {
         var question = new NumericQuestion(id, text);
         questions.add(question);
-        cards.add(question);
-        return id;
+        cards.add(question, id);
     }
 
-    public int newQuestion(String text, Set<String> options) {
-        var id = counter++;
+    public void newQuestion(String id, String text, Set<String> options) {
         var question = new OptionQuestion(id, text, options);
         questions.add(question);
-        cards.add(question);
-        return id;
+        cards.add(question, id);
     }
 
-    public void onFinished(Consumer<Map<Integer, Object>> whenFinished) {
-        this.whenFinished = whenFinished;
+    public void runGui() {
+        if (frame == null) {
+            frame = createFrame();
+        }
+
+        resetState();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private JFrame createFrame() {
+        frame = new JFrame("Quiz");
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        addComponentToPane(frame.getContentPane());
+        frame.pack();
+        return frame;
+    }
+
+    private void resetState() {
+        questions.forEach(Question::reset);
+        answers.clear();
+        hist.clear();
+        if (firstQuestion == null) {
+            firstQuestion = questions.getFirst().id;
+        }
+
+        hist.add(firstQuestion);
+        current = 0;
+        showCurrentCard();
+        updateButtons();
     }
 
     private void addComponentToPane(Container pane) {
@@ -78,6 +95,8 @@ public class Quiz {
         });
 
         nextButton.addActionListener(_ -> {
+            var question = hist.get(current);
+            answerQuestion(question, answers.get(question));
             nextCard();
             updateButtons();
         });
@@ -87,46 +106,55 @@ public class Quiz {
         updateButtons();
     }
 
+    private void answerQuestion(String question, Object answer) {
+        var nextQuestion = onQuestionAnswered.apply(question, answer);
+        if (nextQuestion == null) {
+            frame.setVisible(false);
+        } else if (!hist.contains(nextQuestion)) {
+            hist.add(nextQuestion);
+        }
+    }
+
     private void nextCard() {
         if (!inLastCard()) {
-            current++;
-            ((CardLayout)cards.getLayout()).next(cards);
-        } else {
-            whenFinished.accept(answers);
-            frame.setVisible(false);
+            current += 1;
+            showCurrentCard();
         }
     }
 
     private void previousCard() {
         if (notInFirstCard()) {
-            current--;
-            ((CardLayout)cards.getLayout()).previous(cards);
+            current -= 1;
+            showCurrentCard();
         }
     }
 
+    private void showCurrentCard() {
+        ((CardLayout)cards.getLayout()).show(cards, hist.get(current));
+    }
+
     private boolean inLastCard() {
-        return current == (cards.getComponentCount() - 1);
+        return current == hist.size() - 1;
     }
 
     private boolean notInFirstCard() {
-        return current != 0;
+        return current > 0;
     }
 
     private void updateButtons() {
         backButton.setEnabled(notInFirstCard());
-        nextButton.setEnabled(answers.get(current) != null);
-        if (inLastCard()) {
-            nextButton.setText("Finalizar");
-        } else {
-            nextButton.setText("Próximo");
-        }
+        nextButton.setEnabled(answers.get(hist.get(current)) != null);
+    }
+
+    public void onQuestionAsnwered(BiFunction<String, Object, String> function) {
+        this.onQuestionAnswered = function;
     }
 
     class NumericQuestion extends Question {
 
         private final JFormattedTextField field;
 
-        public NumericQuestion(int id, String text) {
+        public NumericQuestion(String id, String text) {
             super(id, text);
             var numPanel = new JPanel();
             numPanel.setLayout(new BoxLayout(numPanel, BoxLayout.Y_AXIS));
@@ -172,7 +200,7 @@ public class Quiz {
 
         private final List<JCheckBox> checkBoxes = new ArrayList<>();
 
-        OptionQuestion(int id, String text, Set<String> options) {
+        OptionQuestion(String id, String text, Set<String> options) {
             super(id, text);
 
             var checkBoxPanel = new JPanel();
@@ -214,9 +242,9 @@ public class Quiz {
 
     abstract static class Question extends JPanel {
 
-        protected final int id;
+        final String id;
 
-        Question(int id, String text) {
+        Question(String id, String text) {
             super(new BorderLayout(20, 20));
             this.id = id;
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -224,17 +252,7 @@ public class Quiz {
             add(questionLabel, BorderLayout.NORTH);
         }
 
-        abstract void reset();
-    }
 
-    public void createAndRunGUI() {
-        frame = new JFrame("Quiz");
-        answers.clear();
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        addComponentToPane(frame.getContentPane());
-        frame.pack();
-        frame.setLocationRelativeTo(null); // Center the window
-        frame.setVisible(true);
+        abstract void reset();
     }
 }
