@@ -69,7 +69,7 @@ public class Main {
         }
 
         private void runResult() {
-            var result = new Result(quiz, expert.getFacts(), expert.getObjectivesConclusions(), expert.print());
+            var result = new Result(quiz, expert.getFacts(), expert.getObjectivesConclusions(), expert.print(), expert.getSystem());
             result.onNew(() -> {
                 result.close();
                 expert.clearMemory();

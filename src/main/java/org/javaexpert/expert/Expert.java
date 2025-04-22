@@ -36,13 +36,15 @@ public class Expert {
     private final StringBuilder log = new StringBuilder();
     private final TreeLogger tree;
     private String question = null;
+    private final String system;
     private final Set<String> askableAttrs = new HashSet<>();
 
-    public Expert(Map<String, Attribute> attrs, Map<String, Rule> rules, Set<String> objectives) {
+    public Expert(Map<String, Attribute> attrs, Map<String, Rule> rules, Set<String> objectives, String system) {
         this.rules = rules;
         this.attributes = attrs;
         this.objectives = objectives;
         this.conclusiveRules = conclusiveRules(rules.values(), objectives);
+        this.system = system;
         tree = new TreeLogger();
     }
 
@@ -238,4 +240,7 @@ public class Expert {
             .toList();
     }
 
+    public String getSystem() {
+        return system;
+    }
 }

@@ -57,7 +57,7 @@ public class Parser {
             }
         }
 
-        return new Expert(attrs, rules, objectives);
+        return new Expert(attrs, rules, objectives, lexer.getContent());
     }
 
     private Set<String> parseObjectives() {

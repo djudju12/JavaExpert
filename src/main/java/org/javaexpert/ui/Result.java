@@ -4,8 +4,14 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -14,16 +20,33 @@ public class Result {
     private final Quiz quiz;
     private final JFrame frame;
     private final String hist;
+    private final String system;
     private final Map<String, Object> allFacts; // attrName -> attrValue
     private final Map<String, Object> objectives; // attrName -> attrValue
 
+    static {
+        StyleConstants.setForeground(addStyle("red"), Color.RED);
+        StyleConstants.setForeground(addStyle("blue"), Color.BLUE);
+    }
+
+    private static final Map<Pattern, Style> keywords = Map.of(
+            Pattern.compile("\\bATRIBUTO\\b"), getStyle("blue"),
+            Pattern.compile("\\bOBJETIVOS\\b"), getStyle("blue"),
+            Pattern.compile("\\bREGRA\\b"), getStyle("blue"),
+            Pattern.compile("\\bSE\\b"), getStyle("red"),
+            Pattern.compile("\\bOU\\b"), getStyle("red"),
+            Pattern.compile("\\bE\\b"), getStyle("red"),
+            Pattern.compile("\\bENTAO\\b"), getStyle("red")
+    );
+
     private Runnable onNewFn;
 
-    public Result(Quiz quiz, Map<String, Object> allFacts, Map<String, Object> objectives, String hist) {
+    public Result(Quiz quiz, Map<String, Object> allFacts, Map<String, Object> objectives, String hist, String system) {
         this.quiz = quiz;
         this.allFacts = allFacts;
         this.objectives = objectives;
         this.hist = hist;
+        this.system = system;
         this.frame = new JFrame("Resumo");
     }
 
@@ -36,6 +59,7 @@ public class Result {
         tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives)));
         tabbedPane.addTab("Resultados", makeMapPanel(parseMap(allFacts)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
+        tabbedPane.addTab("System", makeSystemPanel(system));
 
         pane.add(makeMenuBar(), BorderLayout.NORTH);
         pane.add(tabbedPane, BorderLayout.CENTER);
@@ -53,10 +77,12 @@ public class Result {
             }
 
             @Override
-            public void menuDeselected(MenuEvent e) { }
+            public void menuDeselected(MenuEvent e) {
+            }
 
             @Override
-            public void menuCanceled(MenuEvent e) { }
+            public void menuCanceled(MenuEvent e) {
+            }
         });
 
         menuBar.add(menu);
@@ -68,7 +94,7 @@ public class Result {
         var panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        var columns = new String[] { "Atributo", "Valor" };
+        var columns = new String[]{"Atributo", "Valor"};
         var table = new JTable(data, columns);
         var header = table.getTableHeader();
 
@@ -89,7 +115,7 @@ public class Result {
     private static Object[][] parseMap(Map<String, Object> map) {
         var data = new Object[map.size()][2];
         int i = 0;
-        for (var key: map.keySet()) {
+        for (var key : map.keySet()) {
             data[i][0] = key;
             data[i][1] = map.get(key);
             i += 1;
@@ -97,23 +123,77 @@ public class Result {
         return data;
     }
 
+    private JComponent makeSystemPanel(String system) {
+        var panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        var textPanel = new JTextPane() {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                // disable wrap lines
+                return getParent() == null || getUI().getPreferredSize(this).width <= getParent().getSize().width;
+            }
+        };
+
+        appendToPane(textPanel, system);
+        configureTextComponent(textPanel, panel);
+
+        textPanel.replaceSelection(system);
+        keywords.forEach((pattern, style) -> highlight(textPanel, pattern, style));
+        return panel;
+    }
+
+    private void appendToPane(JTextPane tp, String msg) {
+        if (msg == null || msg.isBlank()) return;
+        var sc = StyleContext.getDefaultStyleContext();
+        var aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.BLACK);
+
+        int len = tp.getDocument().getLength();
+        tp.setCaretPosition(len);
+        tp.setCharacterAttributes(aset, false);
+        tp.replaceSelection(msg);
+    }
+
+    public void highlight(JTextPane textComp, Pattern pattern, Style style) {
+        var doc = textComp.getStyledDocument();
+        var text = textComp.getText();
+
+        var matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            doc.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), style, false);
+        }
+
+    }
+
     private JComponent makeTextPanel(String text) {
         var panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         var textArea = new JTextArea(text);
-        textArea.setSize(300, 300);
-        textArea.setEditable(false);
-        textArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        configureTextComponent(textArea, panel);
 
-        var scrollPane = new JScrollPane(textArea);
+        return panel;
+    }
+
+    private void configureTextComponent(JTextComponent textComponent, JPanel mainPainel) {
+        textComponent.setSize(300, 300);
+        textComponent.setEditable(false);
+        textComponent.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        var scrollPane = new JScrollPane(textComponent);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        panel.add(scrollPane, BorderLayout.CENTER);
+        mainPainel.add(scrollPane, BorderLayout.CENTER);
+    }
 
-        return panel;
+    private static Style getStyle(String n) {
+        return StyleContext.getDefaultStyleContext().getStyle(n);
+    }
+
+    private static Style addStyle(String n) {
+        return StyleContext.getDefaultStyleContext().addStyle(n, null);
     }
 
     public void close() {
