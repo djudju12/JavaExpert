@@ -1,21 +1,28 @@
 package org.javaexpert.parser;
 
-public class Token {
+import org.javaexpert.expert.predicate.LogicConnector;
+import org.javaexpert.expert.predicate.LogicOperator;
 
-    private final Location location;
-    private final TokenType type;
+public record Token (Location location, TokenType type, Object value) {
 
-    public Token(Location location, TokenType type) {
-        this.location = location;
-        this.type = type;
+    public String valueStr() {
+        return (String) value;
     }
 
-    public Location getLocation() {
-        return location;
+    public int valueInt() {
+        return (int) value;
     }
 
-    public TokenType getType() {
-        return type;
+    public LogicOperator valueLogicOp() {
+        return (LogicOperator) value;
+    }
+
+    public LogicConnector valueLogicConn() {
+        return (LogicConnector) value;
+    }
+
+    public boolean isAND() {
+        return value.equals(LogicConnector.AND);
     }
 
     @Override
@@ -27,8 +34,6 @@ public class Token {
         STR,
         RULE,
         SE,
-        OU,
-        E,
         ENTAO,
         COMMA,
         OPEN_PAR,
@@ -37,6 +42,7 @@ public class Token {
         ATTR_NUMERIC,
         NUM,
         ATTRIBUTE,
+        LOGIC_CONNECTOR,
         LOGIC_OPERATOR
     }
 }
