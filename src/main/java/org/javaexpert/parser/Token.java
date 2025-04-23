@@ -32,6 +32,7 @@ public record Token (Location location, TokenType type, Object value) {
 
     public enum TokenType {
         STR,
+        NUM,
         RULE,
         SE,
         ENTAO,
@@ -40,7 +41,7 @@ public record Token (Location location, TokenType type, Object value) {
         CLOSE_PAR,
         OBJECTIVES,
         ATTR_NUMERIC,
-        NUM,
+        ATTR_STRING,
         ATTRIBUTE,
         LOGIC_CONNECTOR,
         LOGIC_OPERATOR

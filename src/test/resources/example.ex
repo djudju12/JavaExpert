@@ -1,10 +1,10 @@
-ATRIBUTO "materia_prima"       ("alta", "media", "baixa")
-ATRIBUTO "processo_fabricacao" ("otimo", "aceitavel", "ruim")
-ATRIBUTO "controle_qualidade"  ("rigoroso", "moderado", "fraco")
-ATRIBUTO "durabilidade"        ("alta", "media", "baixa")
-ATRIBUTO "acabamento"          ("excelente", "regular", "defeituoso")
-ATRIBUTO "satisfacao_cliente"  ("alta", "media", "baixa")
-ATRIBUTO "qualidade_final"     ("aceitavel" , "rejeitavel")
+ATRIBUTO "materia_prima"       TEXTO ("alta", "media", "baixa")
+ATRIBUTO "processo_fabricacao" TEXTO ("otimo", "aceitavel", "ruim")
+ATRIBUTO "controle_qualidade"  TEXTO ("rigoroso", "moderado", "fraco")
+ATRIBUTO "durabilidade"        TEXTO ("alta", "media", "baixa")
+ATRIBUTO "acabamento"          TEXTO ("excelente", "regular", "defeituoso")
+ATRIBUTO "satisfacao_cliente"  TEXTO ("alta", "media", "baixa")
+ATRIBUTO "qualidade_final"     TEXTO ("aceitavel" , "rejeitavel")
 
 OBJETIVOS ("qualidade_final")
 

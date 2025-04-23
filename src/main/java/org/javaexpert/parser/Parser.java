@@ -98,7 +98,8 @@ public class Parser {
 
         return switch (token.type()) {
             case ATTR_NUMERIC -> new NumericAttribute(name);
-            case OPEN_PAR -> { // STRINGS
+            case ATTR_STRING -> { // STRINGS
+                lexer.requireNextToken(OPEN_PAR);
                 var attr = new StringAttribute(name);
                 do {
                     token = lexer.requireNextToken(STR);

@@ -115,6 +115,7 @@ public class Lexer {
             case "ATRIBUTO" -> newToken(t, Token.TokenType.ATTRIBUTE);
             case "OBJETIVOS" -> newToken(t, Token.TokenType.OBJECTIVES);
             case "NUMERICO" -> newToken(t, Token.TokenType.ATTR_NUMERIC);
+            case "TEXTO" -> newToken(t, Token.TokenType.ATTR_STRING);
 
             case String strToken when strToken.startsWith("\"") && strToken.endsWith("\"") -> newTokenString(t);
             case String numToken when numToken.matches("^-?\\d+(\\.\\d+)?$") -> newTokenNum(t);

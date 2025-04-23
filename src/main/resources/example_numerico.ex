@@ -1,7 +1,7 @@
 ATRIBUTO "idade" NUMERICO
-ATRIBUTO "sexo" ("feminino", "masculino")
-ATRIBUTO "fase_da_vida" ("nene", "crianca", "adolescente", "adulto", "idoso")
-ATRIBUTO "presente" (
+ATRIBUTO "sexo" TEXTO ("feminino", "masculino")
+ATRIBUTO "fase_da_vida" TEXTO ("nene", "crianca", "adolescente", "adulto", "idoso")
+ATRIBUTO "presente" TEXTO (
   "fralda",
   "boneca", "carrinho",
   "memoria_ram", "iphone",
