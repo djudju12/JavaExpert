@@ -68,8 +68,17 @@ public class Lexer {
         return peekChar();
     }
 
-    private void trimLeft() {
-        while (isWhitespace(peekChar())) consumeChar();
+    private void trimSpaceAndComments() {
+        char c = peekChar();
+        while ((isWhitespace(c) || c == '/') && cursor < content.length()) {
+            if (c == '/') {
+                assertTrue((c = consumeAndPeek()) == '/', "unexpected character '%c'".formatted(c), currentLoc(1));
+                dropLine();
+                c = peekChar();
+            } else {
+                c = consumeAndPeek();
+            }
+        }
     }
 
     public Token requireNextToken() {
@@ -92,7 +101,7 @@ public class Lexer {
     }
 
     private Token fetchToken() {
-        trimLeft();
+        trimSpaceAndComments();
         if (cursor >= content.length()) {
             return null;
         }
@@ -122,6 +131,12 @@ public class Lexer {
 
             default -> throw new IllegalStateException("%s: Invalid token '%s'".formatted(currentLoc(t.length()), t));
         };
+    }
+
+    private void dropLine() {
+        char c = peekChar();
+        while (c != '\n' && cursor < content.length()) c = consumeAndPeek();
+        consumeChar();
     }
 
     private String nextTokenValue() {

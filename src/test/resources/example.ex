@@ -1,4 +1,5 @@
-ATRIBUTO "materia_prima"       TEXTO ("alta", "media", "baixa")
+ATRIBUTO "materia_prima"       TEXTO ("alta", "media", "baixa") // comentario
+// comentario
 ATRIBUTO "processo_fabricacao" TEXTO ("otimo", "aceitavel", "ruim")
 ATRIBUTO "controle_qualidade"  TEXTO ("rigoroso", "moderado", "fraco")
 ATRIBUTO "durabilidade"        TEXTO ("alta", "media", "baixa")
@@ -8,9 +9,10 @@ ATRIBUTO "qualidade_final"     TEXTO ("aceitavel" , "rejeitavel")
 
 OBJETIVOS ("qualidade_final")
 
-REGRA "R1" (
+REGRA "R1" (//comentario
+//comentario
   SE    "materia_prima" = "baixa"
-  OU    "processo_fabricacao" = "ruim"
+  OU    "processo_fabricacao" = "ruim" // comentario
   ENTAO "durabilidade" = "baixa"
 )
 
@@ -43,3 +45,4 @@ REGRA "R6" (
   E     "satisfacao_cliente" = "alta"
   ENTAO "qualidade_final" = "aceitavel"
 )
+//comentario
