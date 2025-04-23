@@ -28,12 +28,16 @@ public class Result {
     static {
         StyleConstants.setForeground(addStyle("red"), Color.RED);
         StyleConstants.setForeground(addStyle("blue"), Color.BLUE);
+        StyleConstants.setForeground(addStyle("brown"), new Color(0xA5, 0x50, 0x31));
     }
 
     private static final Map<Pattern, Style> keywords = Map.of(
             Pattern.compile("\\bATRIBUTO\\b"), getStyle("blue"),
             Pattern.compile("\\bOBJETIVOS\\b"), getStyle("blue"),
             Pattern.compile("\\bREGRA\\b"), getStyle("blue"),
+            Pattern.compile("\\bNUMERICO\\b"), getStyle("blue"),
+            Pattern.compile("\\bTEXTO\\b"), getStyle("blue"),
+            Pattern.compile("//.*"), getStyle("brown"),
             Pattern.compile("\\bSE\\b"), getStyle("red"),
             Pattern.compile("\\bOU\\b"), getStyle("red"),
             Pattern.compile("\\bE\\b"), getStyle("red"),
@@ -96,7 +100,13 @@ public class Result {
         panel.setLayout(new BorderLayout());
 
         var columns = new String[]{"Atributo", "Valor"};
-        var table = new JTable(data, columns);
+        var table = new JTable(data, columns) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
         var header = table.getTableHeader();
 
         header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -147,12 +157,11 @@ public class Result {
     private void appendToPane(JTextPane tp, String msg) {
         if (msg == null || msg.isBlank()) return;
         var sc = StyleContext.getDefaultStyleContext();
-        var aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.BLACK);
+        var styleAttrs = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.BLACK);
 
-        int len = tp.getDocument().getLength();
-        tp.setCaretPosition(len);
-        tp.setCharacterAttributes(aset, false);
-        tp.replaceSelection(msg);
+        tp.setCharacterAttributes(styleAttrs, false);
+        tp.setText(msg);
+        tp.setCaretPosition(0);
     }
 
     public void highlight(JTextPane textComp, Pattern pattern, Style style) {
@@ -163,7 +172,6 @@ public class Result {
         while (matcher.find()) {
             doc.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), style, false);
         }
-
     }
 
     private JComponent makeTextPanel(String text) {

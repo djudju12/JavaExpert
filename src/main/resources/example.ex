@@ -1,3 +1,4 @@
+// Desenvolvido por Jonathan Santos
 ATRIBUTO "materia_prima"       TEXTO ("alta", "media", "baixa")
 ATRIBUTO "processo_fabricacao" TEXTO ("otimo", "aceitavel", "ruim")
 ATRIBUTO "controle_qualidade"  TEXTO ("rigoroso", "moderado", "fraco")
