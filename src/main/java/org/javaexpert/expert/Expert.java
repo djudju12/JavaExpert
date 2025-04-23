@@ -59,7 +59,7 @@ public class Expert {
     }
 
     public Map<String, Object> getObjectivesConclusions() {
-        var m = new HashMap<String, Object>(objectives.size());
+        Map<String, Object> m = HashMap.newHashMap(objectives.size());
         objectives.forEach(o -> m.put(o, unwrapFactValue(facts.get(o))));
         return m;
     }
@@ -99,7 +99,7 @@ public class Expert {
         for (var rule: conclusiveRules) {
             if (verifyRule(rule, new TreeSet<>(rules.values()), null)) {
                 log.append(tree.print());
-                log.append(format("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name()));
+                log.append(format("%n>>>>> REGRA ACEITA: '%s' <<<<<%n", rule.name()));
                 return Optional.empty();
             }
 
@@ -126,7 +126,7 @@ public class Expert {
                 .filter(rule -> {
                     if (verifyRule(rule, new TreeSet<>(rules.values()), null)) {
                         log.append(tree.print());
-                        log.append(format("\n>>>>> REGRA ACEITA: '%s' <<<<<\n", rule.name()));
+                        log.append(format("%n>>>>> REGRA ACEITA: '%s' <<<<<%n", rule.name()));
                         return true;
                     }
 

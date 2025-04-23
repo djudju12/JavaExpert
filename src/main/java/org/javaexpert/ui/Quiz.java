@@ -32,8 +32,6 @@ public class Quiz {
 
     private BiFunction<String, Object, String> onQuestionAnswered;
 
-    public Quiz() { }
-
     public void setFirstQuestion(String question) {
         firstQuestion = question;
     }

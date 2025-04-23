@@ -12,8 +12,6 @@ public class TreeLogger {
     private final List<String> lines = new ArrayList<>();
     private int counter = 1;
 
-    public TreeLogger() { }
-
     public Node appendf(Node parent, String fmt, Object ...objects) {
         return append(parent, format(fmt, objects));
     }

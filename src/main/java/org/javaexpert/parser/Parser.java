@@ -59,8 +59,7 @@ public class Parser {
 
                 case OBJECTIVES: objectives.addAll(parseObjectives()); break;
 
-                default:
-                    throw new IllegalStateException("%s: unexpected token %s".formatted(token.location(), token));
+                default: throw new UnexpectedTokenException(token);
             }
         }
 
@@ -110,7 +109,7 @@ public class Parser {
                 yield attr;
             }
 
-            default -> throw new IllegalStateException("%s: unexpected token %s".formatted(token.location(), token));
+            default -> throw new UnexpectedTokenException(token);
         };
     }
 
@@ -153,7 +152,7 @@ public class Parser {
                 yield new NumericPredicate(attributeName, token.valueInt(), op);
             }
 
-            default -> throw new IllegalStateException("%s: unexpected token %s".formatted(token.location(), token));
+            default -> throw new UnexpectedTokenException(token);
         };
     }
 
@@ -165,7 +164,7 @@ public class Parser {
         return switch (token.type()) {
             case STR -> new StringFact(attributeName, token.valueStr());
             case NUM -> new NumericFact(attributeName, token.valueInt());
-            default -> throw new IllegalStateException("%s: unexpected token %s".formatted(token.location(), token));
+            default -> throw new UnexpectedTokenException(token);
         };
     }
 

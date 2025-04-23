@@ -25,7 +25,7 @@ public record NumericPredicate(
                 case LTE -> numFact.getValue() <= value();
             };
         } else {
-            throw new RuntimeException("inconsistency between facts and rules");
+            throw new IllegalStateException("inconsistency between facts and rules");
         }
     }
 }

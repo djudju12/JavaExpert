@@ -1,6 +1,7 @@
 package org.javaexpert;
 
 
+import jdk.dynalink.beans.StaticClass;
 import org.javaexpert.expert.Expert;
 import org.javaexpert.ui.Quiz;
 import org.javaexpert.ui.Result;
@@ -9,16 +10,17 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.io.IOException;
+import java.util.function.BiFunction;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
         System.setProperty("awt.useSystemAAFontSettings", "on");
-        setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
+//        setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
-//        qualidadeProdutoExample();
+        qualidadeProdutoExample();
 //        presenteExample();
-        exemplAula();
+//        exemplAula();
     }
 
     private static void exemplAula() throws IOException {
@@ -91,17 +93,13 @@ public class Main {
         }
 
         private void runResult() {
-            var result = new Result(quiz, expert.getFacts(), expert.getObjectivesConclusions(), expert.print(), expert.getSystem());
-            result.onNew(() -> {
-                result.close();
-                expert.clearMemory();
-                runQuiz();
-            });
-
+            var result = new Result(expert);
+            result.onNew(this::runQuiz);
             result.createAndShowGUI();
         }
 
         public void runQuiz() {
+            expert.clearMemory();
             var firstQuestionOpt = expert.thinkIfNotConclusiveAskQuestion();
             if (firstQuestionOpt.isPresent()) {
                 quiz.setFirstQuestion(firstQuestionOpt.get());

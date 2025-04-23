@@ -1,5 +1,7 @@
 package org.javaexpert.expert.fact;
 
+import java.util.Objects;
+
 public abstract class Fact<T> implements Comparable<Fact<T>> {
 
     private final String name;
@@ -31,4 +33,16 @@ public abstract class Fact<T> implements Comparable<Fact<T>> {
         return fact.getName().compareTo(name);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Fact<?> fact = (Fact<?>) o;
+        return Objects.equals(name, fact.name) && Objects.equals(value, fact.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
 }

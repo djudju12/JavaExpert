@@ -1,5 +1,7 @@
 package org.javaexpert.ui;
 
+import org.javaexpert.expert.Expert;
+
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.MenuEvent;
@@ -17,7 +19,6 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Result {
 
-    private final Quiz quiz;
     private final JFrame frame;
     private final String hist;
     private final String system;
@@ -41,8 +42,11 @@ public class Result {
 
     private Runnable onNewFn;
 
-    public Result(Quiz quiz, Map<String, Object> allFacts, Map<String, Object> objectives, String hist, String system) {
-        this.quiz = quiz;
+    public Result(Expert expert) {
+        this(expert.getFacts(), expert.getObjectivesConclusions(), expert.print(), expert.getSystem());
+    }
+
+    private Result(Map<String, Object> allFacts, Map<String, Object> objectives, String hist, String system) {
         this.allFacts = allFacts;
         this.objectives = objectives;
         this.hist = hist;
@@ -55,11 +59,11 @@ public class Result {
     }
 
     private void addComponentToPane(Container pane) {
-        var tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        var tabbedPane = new JTabbedPane(SwingConstants.TOP);
         tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives)));
         tabbedPane.addTab("Resultados", makeMapPanel(parseMap(allFacts)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
-        tabbedPane.addTab("System", makeSystemPanel(system));
+        tabbedPane.addTab("Sistema", makeSystemPanel(system));
 
         pane.add(makeMenuBar(), BorderLayout.NORTH);
         pane.add(tabbedPane, BorderLayout.CENTER);
@@ -71,18 +75,15 @@ public class Result {
         menu.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent e) {
-                onNewFn.run();
-                quiz.runGui();
                 frame.dispose();
+                onNewFn.run();
             }
 
             @Override
-            public void menuDeselected(MenuEvent e) {
-            }
+            public void menuDeselected(MenuEvent e) { /* do nothing */ }
 
             @Override
-            public void menuCanceled(MenuEvent e) {
-            }
+            public void menuCanceled(MenuEvent e) { /* do nothing */ }
         });
 
         menuBar.add(menu);
@@ -115,9 +116,9 @@ public class Result {
     private static Object[][] parseMap(Map<String, Object> map) {
         var data = new Object[map.size()][2];
         int i = 0;
-        for (var key : map.keySet()) {
-            data[i][0] = key;
-            data[i][1] = map.get(key);
+        for (var entry : map.entrySet()) {
+            data[i][0] = entry.getKey();
+            data[i][1] = entry.getValue();
             i += 1;
         }
         return data;
@@ -194,10 +195,6 @@ public class Result {
 
     private static Style addStyle(String n) {
         return StyleContext.getDefaultStyleContext().addStyle(n, null);
-    }
-
-    public void close() {
-        frame.dispose();
     }
 
     public void createAndShowGUI() {
