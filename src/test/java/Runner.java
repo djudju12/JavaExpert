@@ -103,8 +103,6 @@ public class Runner {
             private final Set<Fact<?>> facts = new TreeSet<>();
             private String acceptedRule;
 
-            public TestCaseBuilder() { }
-
             public TestCaseBuilder testName(String name) {
                 this.testName = name;
                 return this;

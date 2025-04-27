@@ -125,15 +125,12 @@ public class Main {
 
         private void runResult() {
             var result = new Result(expert);
-            result.onNew(() -> {
-                expert.clearMemory();
-                runQuiz();
-            });
-
+            result.onNew(this::runQuiz);
             result.createAndShowGUI();
         }
 
         public void runQuiz() {
+            expert.clearMemory();
             var firstQuestionOpt = expert.thinkIfNotConclusiveAskQuestion();
             if (firstQuestionOpt.isPresent()) {
                 quiz.setFirstQuestion(firstQuestionOpt.get());

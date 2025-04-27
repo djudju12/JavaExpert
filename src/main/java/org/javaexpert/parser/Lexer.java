@@ -147,9 +147,9 @@ public class Lexer {
         sb.append(c);
         consumeChar();
         switch (c) {
-            case ',': case ')': case '(': case '=': break;
+            case ',', ')', '(', '=': break;
 
-            case '<': case '>':  {
+            case '<', '>':  {
                 if ((c = peekChar()) == '=' || c == '>') {
                     sb.append(c);
                     consumeChar();

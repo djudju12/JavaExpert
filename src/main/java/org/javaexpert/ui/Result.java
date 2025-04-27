@@ -28,20 +28,20 @@ public class Result {
     static {
         StyleConstants.setForeground(addStyle("red"), Color.RED);
         StyleConstants.setForeground(addStyle("blue"), Color.BLUE);
-        StyleConstants.setForeground(addStyle("brown"), new Color(0xCD, 0x64, 0x64));
+        StyleConstants.setForeground(addStyle("brown"), new Color(0xA5, 0x50, 0x31));
     }
 
     private static final Map<Pattern, Style> keywords = Map.of(
             Pattern.compile("\\bATRIBUTO\\b"), getStyle("blue"),
             Pattern.compile("\\bOBJETIVOS\\b"), getStyle("blue"),
             Pattern.compile("\\bREGRA\\b"), getStyle("blue"),
-            Pattern.compile("\\bTEXTO\\b"), getStyle("blue"),
             Pattern.compile("\\bNUMERICO\\b"), getStyle("blue"),
+            Pattern.compile("\\bTEXTO\\b"), getStyle("blue"),
+            Pattern.compile("//.*"), getStyle("brown"),
             Pattern.compile("\\bSE\\b"), getStyle("red"),
             Pattern.compile("\\bOU\\b"), getStyle("red"),
             Pattern.compile("\\bE\\b"), getStyle("red"),
-            Pattern.compile("\\bENTAO\\b"), getStyle("red"),
-            Pattern.compile("//.*"), getStyle("brown")
+            Pattern.compile("\\bENTAO\\b"), getStyle("red")
     );
 
     private Runnable onNewFn;
@@ -63,7 +63,7 @@ public class Result {
     }
 
     private void addComponentToPane(Container pane) {
-        var tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        var tabbedPane = new JTabbedPane(SwingConstants.TOP);
         tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives)));
         tabbedPane.addTab("Resultados", makeMapPanel(parseMap(allFacts)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
@@ -79,17 +79,15 @@ public class Result {
         menu.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent e) {
-                onNewFn.run();
                 frame.dispose();
+                onNewFn.run();
             }
 
             @Override
-            public void menuDeselected(MenuEvent e) {
-            }
+            public void menuDeselected(MenuEvent e) { /* do nothing */ }
 
             @Override
-            public void menuCanceled(MenuEvent e) {
-            }
+            public void menuCanceled(MenuEvent e) { /* do nothing */ }
         });
 
         menuBar.add(menu);
@@ -102,7 +100,13 @@ public class Result {
         panel.setLayout(new BorderLayout());
 
         var columns = new String[]{"Atributo", "Valor"};
-        var table = new JTable(data, columns);
+        var table = new JTable(data, columns) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
         var header = table.getTableHeader();
 
         header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -122,9 +126,9 @@ public class Result {
     private static Object[][] parseMap(Map<String, Object> map) {
         var data = new Object[map.size()][2];
         int i = 0;
-        for (var key : map.keySet()) {
-            data[i][0] = key;
-            data[i][1] = map.get(key);
+        for (var entry : map.entrySet()) {
+            data[i][0] = entry.getKey();
+            data[i][1] = entry.getValue();
             i += 1;
         }
         return data;
@@ -153,11 +157,10 @@ public class Result {
     private void appendToPane(JTextPane tp, String msg) {
         if (msg == null || msg.isBlank()) return;
         var sc = StyleContext.getDefaultStyleContext();
-        var aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.BLACK);
-
+        var styleAttrs = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.BLACK);
         tp.setText(msg);
         tp.setCaretPosition(0);
-        tp.setCharacterAttributes(aset, false);
+        tp.setCharacterAttributes(styleAttrs, false);
     }
 
     public void highlight(JTextPane textComp, Pattern pattern, Style style) {
@@ -168,7 +171,6 @@ public class Result {
         while (matcher.find()) {
             doc.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), style, false);
         }
-
     }
 
     private JComponent makeTextPanel(String text) {
