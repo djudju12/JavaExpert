@@ -143,7 +143,7 @@ public class Parser {
         var token = lexer.requireNextToken();
         return switch (token.type()) {
             case STR -> {
-                assertTrue(op == LogicOperator.EQ, "invalid operator between string", optoken.location());
+                assertTrue(op == LogicOperator.EQ || op == LogicOperator.NEQ, "invalid operator between string", optoken.location());
                 assertTrue(attr instanceof StringAttribute, "invalid predicate. Attribute is not string", token.location());
                 yield new StringPredicate(attributeName, token.valueStr(), op);
             }
@@ -173,7 +173,7 @@ public class Parser {
         var token = lexer.requireNextToken(STR);
         var attributeName = token.valueStr();
         var attr = attrs.get(attributeName);
-        assertNotNull(attr, "attribute not found", token.location());
+        assertNotNull(attr, "attribute '%s' not found".formatted(attributeName), token.location());
         return attributeName;
     }
 }

@@ -19,6 +19,7 @@ public record NumericPredicate(
         if (fact instanceof NumericFact numFact) {
             return switch (operator()) {
                 case EQ -> numFact.getValue().equals(value());
+                case NEQ -> !numFact.getValue().equals(value());
                 case GT -> numFact.getValue() > value();
                 case GTE -> numFact.getValue() >= value();
                 case LT -> numFact.getValue() < value();

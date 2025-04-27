@@ -16,9 +16,42 @@ public class Main {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
 
+        decisaoProblemaSaudeAutodelimitado_desmenorreia();
+
+
 //        qualidadeProdutoExample();
 //        presenteExample();
-        exemplAula();
+//        exemplAula();
+    }
+
+    private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
+        var manager = new QuizManager(Expert.fromFile("dismenorreia.ex"));
+        // TODO: criar variaveis univalodaras
+
+        manager.addMultiOptionsQuestion("Quando as dores se iniciam?", "dor_inicio");
+
+        // TODO: criar uma questão melhor
+        // TODO: separar 'unilateral' em outra questão?
+        manager.addMultiOptionsQuestion("Caracteristicas da dor?", "caracteristica_dor");
+        manager.addMultiOptionsQuestion("Houve alteração do local da dor?", "alteracao_do_local");
+
+        manager.addMultiOptionsQuestion("Qual é a intensidade da dor?", "intesidade_dor");
+
+        manager.addMultiOptionsQuestion("Os sintomas estão associados à menstruação?", "dor_associada_menstruacao");
+
+        // TODO: separar em 'possui outros sintomas?' e 'quais?'
+        // TODO: podemos usar variaveis multivaloradas aqui
+        manager.addMultiOptionsQuestion("Possui outros sintomas?", "outros_sintomas");
+
+        manager.addMultiOptionsQuestion("Quando suas cólicas iniciaram?", "primeira_dismenorreia");
+
+        // TODO: podemos usar variaveis multivaloradas aqui
+        manager.addMultiOptionsQuestion("Possui alguma dessas condições?", "historico_clinico");
+
+        // TODO: podemos usar variaveis multivaloradas aqui
+        manager.addMultiOptionsQuestion("Já fez tratamentos prévios?", "historico_farmacoterapeutico");
+
+        manager.runQuiz();
     }
 
     private static void exemplAula() throws IOException {
@@ -91,9 +124,8 @@ public class Main {
         }
 
         private void runResult() {
-            var result = new Result(quiz, expert.getFacts(), expert.getObjectivesConclusions(), expert.print(), expert.getSystem());
+            var result = new Result(expert);
             result.onNew(() -> {
-                result.close();
                 expert.clearMemory();
                 runQuiz();
             });

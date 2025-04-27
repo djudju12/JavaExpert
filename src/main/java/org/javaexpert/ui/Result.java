@@ -1,5 +1,7 @@
 package org.javaexpert.ui;
 
+import org.javaexpert.expert.Expert;
+
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.MenuEvent;
@@ -17,7 +19,6 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Result {
 
-    private final Quiz quiz;
     private final JFrame frame;
     private final String hist;
     private final String system;
@@ -27,22 +28,29 @@ public class Result {
     static {
         StyleConstants.setForeground(addStyle("red"), Color.RED);
         StyleConstants.setForeground(addStyle("blue"), Color.BLUE);
+        StyleConstants.setForeground(addStyle("brown"), new Color(0xCD, 0x64, 0x64));
     }
 
     private static final Map<Pattern, Style> keywords = Map.of(
             Pattern.compile("\\bATRIBUTO\\b"), getStyle("blue"),
             Pattern.compile("\\bOBJETIVOS\\b"), getStyle("blue"),
             Pattern.compile("\\bREGRA\\b"), getStyle("blue"),
+            Pattern.compile("\\bTEXTO\\b"), getStyle("blue"),
+            Pattern.compile("\\bNUMERICO\\b"), getStyle("blue"),
             Pattern.compile("\\bSE\\b"), getStyle("red"),
             Pattern.compile("\\bOU\\b"), getStyle("red"),
             Pattern.compile("\\bE\\b"), getStyle("red"),
-            Pattern.compile("\\bENTAO\\b"), getStyle("red")
+            Pattern.compile("\\bENTAO\\b"), getStyle("red"),
+            Pattern.compile("//.*"), getStyle("brown")
     );
 
     private Runnable onNewFn;
 
-    public Result(Quiz quiz, Map<String, Object> allFacts, Map<String, Object> objectives, String hist, String system) {
-        this.quiz = quiz;
+    public Result(Expert expert) {
+        this(expert.getFacts(), expert.getObjectivesConclusions(), expert.print(), expert.getSystem());
+    }
+
+    private Result(Map<String, Object> allFacts, Map<String, Object> objectives, String hist, String system) {
         this.allFacts = allFacts;
         this.objectives = objectives;
         this.hist = hist;
@@ -59,7 +67,7 @@ public class Result {
         tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives)));
         tabbedPane.addTab("Resultados", makeMapPanel(parseMap(allFacts)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
-        tabbedPane.addTab("System", makeSystemPanel(system));
+        tabbedPane.addTab("Sistema", makeSystemPanel(system));
 
         pane.add(makeMenuBar(), BorderLayout.NORTH);
         pane.add(tabbedPane, BorderLayout.CENTER);
@@ -72,7 +80,6 @@ public class Result {
             @Override
             public void menuSelected(MenuEvent e) {
                 onNewFn.run();
-                quiz.runGui();
                 frame.dispose();
             }
 
@@ -148,10 +155,9 @@ public class Result {
         var sc = StyleContext.getDefaultStyleContext();
         var aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.BLACK);
 
-        int len = tp.getDocument().getLength();
-        tp.setCaretPosition(len);
+        tp.setText(msg);
+        tp.setCaretPosition(0);
         tp.setCharacterAttributes(aset, false);
-        tp.replaceSelection(msg);
     }
 
     public void highlight(JTextPane textComp, Pattern pattern, Style style) {
@@ -194,10 +200,6 @@ public class Result {
 
     private static Style addStyle(String n) {
         return StyleContext.getDefaultStyleContext().addStyle(n, null);
-    }
-
-    public void close() {
-        frame.dispose();
     }
 
     public void createAndShowGUI() {

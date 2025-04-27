@@ -22,6 +22,7 @@ import static org.javaexpert.expert.predicate.LogicOperator.GT;
 import static org.javaexpert.expert.predicate.LogicOperator.GTE;
 import static org.javaexpert.expert.predicate.LogicOperator.LT;
 import static org.javaexpert.expert.predicate.LogicOperator.LTE;
+import static org.javaexpert.expert.predicate.LogicOperator.NEQ;
 
 public class Lexer {
     private final String filePath;
@@ -116,6 +117,7 @@ public class Lexer {
             case "=" -> newTokenOperator(t, EQ);
             case "<=" -> newTokenOperator(t, LTE);
             case ">=" -> newTokenOperator(t, GTE);
+            case "<>" ->  newTokenOperator(t, NEQ);
             case "E" -> newTokenConnector(t, AND);
             case "OU" -> newTokenConnector(t, OR);
             case "SE" -> newToken(t, Token.TokenType.SE);
@@ -148,7 +150,7 @@ public class Lexer {
             case ',': case ')': case '(': case '=': break;
 
             case '<': case '>':  {
-                if ((c = peekChar()) == '=') {
+                if ((c = peekChar()) == '=' || c == '>') {
                     sb.append(c);
                     consumeChar();
                 }

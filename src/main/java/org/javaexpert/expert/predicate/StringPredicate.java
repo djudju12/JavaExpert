@@ -15,6 +15,10 @@ public record StringPredicate(
 
     @Override
     public boolean validateFact(Fact<?> fact) {
-        return value().equals(fact.getValue());
+        return switch (operator) {
+            case EQ -> value().equals(fact.getValue());
+            case NEQ -> !value().equals(fact.getValue());
+            default -> throw new IllegalStateException("Operator between string must be '=' or '<>'");
+        };
     }
 }
