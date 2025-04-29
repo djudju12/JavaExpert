@@ -220,11 +220,12 @@ public class Quiz {
     class MultiOptionQuestion extends Question implements ItemListener {
 
         private final Set<String> selectedOptions = new HashSet<>();
+        private final List<JCheckBox> checkBoxes;
 
         MultiOptionQuestion(String id, String text, List<String> options) {
             super(id, text);
             var checkBoxPanel = new JPanel();
-            createCheckBoxes(checkBoxPanel, this, options);
+            checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
             add(checkBoxPanel, BorderLayout.CENTER);
         }
 
@@ -243,7 +244,7 @@ public class Quiz {
 
         @Override
         void reset() {
-            selectedOptions.clear();
+            checkBoxes.forEach(cb -> cb.setSelected(false));
         }
     }
 

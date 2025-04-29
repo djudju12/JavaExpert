@@ -96,6 +96,10 @@ public class Lexer {
         assertTrue(lastToken.type() == type, "expected '%s' found: '%s' ".formatted(type, lastToken), lastToken.location());
     }
 
+    public Token getLastToken() {
+        return lastToken;
+    }
+
     public Optional<Token> nextToken() {
         lastToken = fetchToken();
         return Optional.ofNullable(lastToken);

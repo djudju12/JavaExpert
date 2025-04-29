@@ -40,7 +40,8 @@ public class Main {
         manager.addOptionsQuestion("Os sintomas estão associados à menstruação?", "dor_associada_menstruacao");
 
         // TODO: separar em 'possui outros sintomas?' e 'quais?'
-        manager.addMultiOptionsQuestion("Possui outros sintomas?", "outros_sintomas");
+        manager.addOptionsQuestion("Possui outros sintomas?", "possui_outros_sintomas");
+        manager.addMultiOptionsQuestion("O paciente apresenta algum desses sintomas?", "outros_sintomas");
 
         manager.addOptionsQuestion("Quando suas cólicas iniciaram?", "primeira_dismenorreia");
 
@@ -98,6 +99,7 @@ public class Main {
             quiz.onQuestionAsnwered((id, answer) -> {
                 if (answer == null) return id;
                 if (answer instanceof Set<?> answers) {
+                    expert.removeFact(id);
                     answers.forEach(a -> expert.newFact(id, a));
                 } else {
                     expert.newFact(id, answer);

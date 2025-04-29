@@ -124,13 +124,28 @@ public class Parser {
     }
 
     private Predicate parseSe() {
-        var predicate = parseSimplePredicate();
+        var predicate = parsePredicate();
+        lexer.assertLastToken(ENTAO);
+        return predicate;
+    }
 
-        for (var token = lexer.requireNextToken(); token.type() == LOGIC_CONNECTOR; token = lexer.requireNextToken()) {
-            predicate = new CompoundPredicate(predicate, parseSimplePredicate(), token.valueLogicConn());
+    private Predicate parsePredicate() {
+        Predicate predicate;
+        var token = lexer.requireNextToken();
+        if (token.type() == OPEN_PAR) {
+            predicate = parsePredicate();
+            lexer.assertLastToken(CLOSE_PAR);
+        } else {
+            predicate = parseSimplePredicate();
         }
 
-        lexer.assertLastToken(ENTAO);
+        do {
+            token = lexer.requireNextToken();
+            if (token.type() == LOGIC_CONNECTOR) {
+                predicate = new CompoundPredicate(predicate, parsePredicate(), token.valueLogicConn());
+            }
+        } while (lexer.getLastToken().type() == LOGIC_CONNECTOR);
+
         return predicate;
     }
 
@@ -157,6 +172,7 @@ public class Parser {
     }
 
     private Fact parseFact() {
+        lexer.requireNextToken(STR);
         var attributeName = parseAttrName();
         var token = lexer.requireNextToken(LOGIC_OPERATOR);
         assertTrue(token.valueLogicOp() == LogicOperator.EQ, "invalid fact operator. Must be a '='", token.location());
@@ -169,7 +185,8 @@ public class Parser {
     }
 
     private String parseAttrName() {
-        var token = lexer.requireNextToken(STR);
+        lexer.assertLastToken(STR);
+        var token = lexer.getLastToken();
         var attributeName = token.valueStr();
         var attr = attrs.get(attributeName);
         assertNotNull(attr, "attribute '%s' not found".formatted(attributeName), token.location());

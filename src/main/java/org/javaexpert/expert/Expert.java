@@ -229,6 +229,10 @@ public class Expert {
         }
     }
 
+    public void removeFact(String attrName) {
+        facts.remove(attrName);
+    }
+
     private static List<Rule> conclusiveRules(Collection<Rule> rules, Set<String> objectives) {
         return rules
             .stream()

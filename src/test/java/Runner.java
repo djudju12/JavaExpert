@@ -14,7 +14,8 @@ public class Runner {
         var testCases = Set.of(
                 numerics(),
                 strings(),
-                qualidadeAceitavel()
+                qualidadeAceitavel(),
+                precedente()
         );
 
         var total = 0;
@@ -80,6 +81,18 @@ public class Runner {
                 .fact("materia_prima","alta")
                 .fact("processo_fabricacao","otimo")
                 .ruleIs("R6")
+                .build();
+    }
+
+    private static TestCase precedente() throws IOException {
+        var expert = Expert.fromFile("precedence_example.ex");
+
+        return TestCase.builder()
+                .expert(expert)
+                .testName("String values")
+                .fact("AA","A")
+                .fact("AB","C")
+                .ruleIs("R1")
                 .build();
     }
 
