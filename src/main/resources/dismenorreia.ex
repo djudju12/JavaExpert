@@ -12,7 +12,7 @@ ATRIBUTO "dor_inicio" TEXTO ("2 dias antes da menstruação", "Sem relação tem
 
 // Características dos sintomas
 // TODO: 'caracteristica_dor' pode ser separada em duas regras?
-ATRIBUTO "caracteristica_dor" TEXTO ("Cólica fora do período menstrual", "cólica durante o período menstrual", "unilateral") // Pergunta
+ATRIBUTO "caracteristica_dor" TEXTO ("Cólica fora do período menstrual", "Cólica durante o período menstrual", "unilateral") // Pergunta
 ATRIBUTO "alteracao_do_local" TEXTO ("Sim", "Não") // Pergunta
 
 ATRIBUTO "caracteristicas_incomuns" TEXTO ("Sim", "Não") // Intermediário
@@ -86,8 +86,8 @@ OBJETIVOS ("decisao")
 
 REGRA "caracteristicas_sao_incomuns" (
   SE
-       "caracteristica_dor" = "suprapúbica fora do período menstrual"
-    OU "caracteristica_dor" = "unilateral"
+       "caracteristica_dor" = "Cólica fora do período menstrual"
+    OU "caracteristica_dor" = "Unilateral"
     OU "alteracao_do_local" = "Sim"
   ENTAO
     "caracteristicas_incomuns" = "Sim"
@@ -95,9 +95,9 @@ REGRA "caracteristicas_sao_incomuns" (
 
 REGRA "caracteristicas_nao_sao_incomuns" (
   SE
-      "caracteristica_dor" <> "suprapúbica fora do período menstrual"
-    E "alteracao_do_local" <> "Sim"
-    E "caracteristica_dor" <> "unilateral"
+      "caracteristica_dor" = "Cólica durante o período menstrual"
+    E "alteracao_do_local" = "Não"
+    E "caracteristica_dor" <> "Unilateral"
   ENTAO
       "caracteristicas_incomuns" = "Não"
 )
