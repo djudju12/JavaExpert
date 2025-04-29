@@ -234,12 +234,12 @@ public class Result {
 
     public void createAndShowGUI() {
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
         frame.setResizable(true);
 
         addComponentToPane(frame.getContentPane());
-
-        frame.setSize(500, 500);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+//        frame.setSize(500, 500);
         frame.setVisible(true);
     }
 

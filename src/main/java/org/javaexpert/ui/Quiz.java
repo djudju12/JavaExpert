@@ -164,7 +164,7 @@ public class Quiz {
 
         options.forEach(opt -> {
             var cb = new JCheckBox(opt);
-            cb.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+            cb.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
             cb.setBorderPainted(true);
             checkBoxes.add(cb);
             main.add(cb);
