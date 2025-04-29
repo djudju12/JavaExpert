@@ -26,7 +26,7 @@ public class Main {
     }
 
     private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
-        var manager = new QuizManager(Expert.fromFile("dismenorreia.ex"));
+        var manager = new QuizManager("Problema de Saúde Autodelimitado: Dismenorreia", Expert.fromFile("dismenorreia.ex"));
 
         manager.addOptionsQuestion("Quando as dores se iniciam?", "dor_inicio");
 
@@ -52,7 +52,7 @@ public class Main {
     }
 
     private static void exemplAula() throws IOException {
-        var manager = new QuizManager(Expert.fromFile("examplo_aula.ex"));
+        var manager = new QuizManager("Exemplo: Aula", Expert.fromFile("examplo_aula.ex"));
         manager.addOptionsQuestion("Você tem episódios de lapsos de memória?", "Lapsos");
         manager.addOptionsQuestion("Quando você descreve suas lembranças, qual o nível de detalhamento?", "Lembranças");
         manager.addOptionsQuestion("Como estão os movimentos do seu diafragma?", "Movimentos");
@@ -62,14 +62,14 @@ public class Main {
     }
 
     private static void presenteExample() throws IOException {
-        var manager = new QuizManager(Expert.fromFile("example_numerico.ex"));
+        var manager = new QuizManager("Exemplo: Presente", Expert.fromFile("example_numerico.ex"));
         manager.addNumericQuestion("Qual a idade do aniversariante?", "idade");
         manager.addOptionsQuestion("Qual é o sexo do aniversáriante?", "sexo");
         manager.runQuiz();
     }
 
     private static void qualidadeProdutoExample() throws IOException {
-        var manager = new QuizManager(Expert.fromFile("example.ex"));
+        var manager = new QuizManager("Exemplo: Qualidade de Produto", Expert.fromFile("example.ex"));
         manager.addOptionsQuestion("Como foi o controle de qualidade?", "controle_qualidade");
         manager.addOptionsQuestion("Como está o acabamento do produto?", "acabamento");
         manager.addOptionsQuestion("Qual a qualidade da materia prima?", "materia_prima");
@@ -92,9 +92,9 @@ public class Main {
         private final Expert expert;
         private final Quiz quiz;
 
-        private QuizManager(Expert expert) {
+        private QuizManager(String title, Expert expert) {
             this.expert = expert;
-            this.quiz = new Quiz();
+            this.quiz = new Quiz(title);
 
             quiz.onQuestionAsnwered((id, answer) -> {
                 if (answer == null) return id;

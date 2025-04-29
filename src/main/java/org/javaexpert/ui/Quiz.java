@@ -20,6 +20,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Quiz {
     private JFrame frame;
+    private final String title;
 
     private final JPanel cards = new JPanel(new CardLayout());
     private final List<Question> questions = new ArrayList<>();
@@ -32,6 +33,10 @@ public class Quiz {
     private int current = 0;
 
     private BiFunction<String, Object, String> onQuestionAnswered;
+
+    public Quiz(String title) {
+        this.title = title;
+    }
 
     public void setFirstQuestion(String question) {
         firstQuestion = question;
@@ -66,7 +71,7 @@ public class Quiz {
     }
 
     private JFrame createFrame() {
-        frame = new JFrame("Quiz");
+        frame = new JFrame(title);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setResizable(false);
         addComponentToPane(frame.getContentPane());
