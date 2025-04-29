@@ -1,6 +1,8 @@
 package org.javaexpert.ui;
 
 import org.javaexpert.expert.Expert;
+import org.javaexpert.expert.fact.Fact;
+import org.javaexpert.expert.fact.StringFact;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -13,6 +15,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
@@ -22,8 +25,8 @@ public class Result {
     private final JFrame frame;
     private final String hist;
     private final String system;
-    private final Map<String, Object> allFacts; // attrName -> attrValue
-    private final Map<String, Object> objectives; // attrName -> attrValue
+    private final Set<Fact> allFacts; // attrName -> attrValue
+    private final Map<String, Fact> objectives; // attrName -> attrValue
 
     static {
         StyleConstants.setForeground(addStyle("red"), Color.RED);
@@ -50,7 +53,7 @@ public class Result {
         this(expert.getFacts(), expert.getObjectivesConclusions(), expert.print(), expert.getSystem());
     }
 
-    private Result(Map<String, Object> allFacts, Map<String, Object> objectives, String hist, String system) {
+    private Result(Set<Fact> allFacts, Map<String, Fact> objectives, String hist, String system) {
         this.allFacts = allFacts;
         this.objectives = objectives;
         this.hist = hist;
@@ -64,8 +67,8 @@ public class Result {
 
     private void addComponentToPane(Container pane) {
         var tabbedPane = new JTabbedPane(SwingConstants.TOP);
-        tabbedPane.addTab("Conclusões", makeMapPanel(parseMap(objectives)));
-        tabbedPane.addTab("Resultados", makeMapPanel(parseMap(allFacts)));
+        tabbedPane.addTab("Conclusões", makeMapPanel(parseFacts(objectives)));
+        tabbedPane.addTab("Resultados", makeMapPanel(parseFacts(allFacts)));
         tabbedPane.addTab("Histórico", makeTextPanel(hist));
         tabbedPane.addTab("Sistema", makeSystemPanel(system));
 
@@ -123,15 +126,37 @@ public class Result {
         return panel;
     }
 
-    private static Object[][] parseMap(Map<String, Object> map) {
+    private static Object[][] parseFacts(Set<Fact> facts) {
+        var data = new Object[facts.size()][2];
+        int i = 0;
+        for (var fact: facts) {
+            data[i][0] = fact.name();
+            data[i][1] = formatFact(fact);
+            i += 1;
+        }
+
+        return data;
+    }
+
+    private static Object[][] parseFacts(Map<String, Fact> map) {
         var data = new Object[map.size()][2];
         int i = 0;
         for (var entry : map.entrySet()) {
             data[i][0] = entry.getKey();
-            data[i][1] = entry.getValue();
+            data[i][1] = formatFact(entry.getValue());
             i += 1;
         }
         return data;
+    }
+
+    private static String formatFact(Fact fact) {
+        if (fact == null) {
+            return "DESCONHECIDO";
+        } else if (fact instanceof StringFact strFact) {
+            return String.join(",", strFact.value());
+        }
+
+        return (String) fact.value();
     }
 
     private JComponent makeSystemPanel(String system) {

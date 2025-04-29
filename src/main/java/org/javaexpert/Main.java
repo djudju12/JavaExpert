@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Set;
 
 public class Main {
 
@@ -26,29 +27,24 @@ public class Main {
 
     private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
         var manager = new QuizManager(Expert.fromFile("dismenorreia.ex"));
-        // TODO: criar variaveis univalodaras
 
-        manager.addMultiOptionsQuestion("Quando as dores se iniciam?", "dor_inicio");
+        manager.addOptionsQuestion("Quando as dores se iniciam?", "dor_inicio");
 
         // TODO: criar uma questão melhor
         // TODO: separar 'unilateral' em outra questão?
-        manager.addMultiOptionsQuestion("Caracteristicas da dor?", "caracteristica_dor");
-        manager.addMultiOptionsQuestion("Houve alteração do local da dor?", "alteracao_do_local");
+        manager.addOptionsQuestion("Caracteristicas da dor?", "caracteristica_dor");
+        manager.addOptionsQuestion("Houve alteração do local da dor?", "alteracao_do_local");
 
-        manager.addMultiOptionsQuestion("Qual é a intensidade da dor?", "intesidade_dor");
+        manager.addOptionsQuestion("Qual é a intensidade da dor?", "intesidade_dor");
 
-        manager.addMultiOptionsQuestion("Os sintomas estão associados à menstruação?", "dor_associada_menstruacao");
+        manager.addOptionsQuestion("Os sintomas estão associados à menstruação?", "dor_associada_menstruacao");
 
         // TODO: separar em 'possui outros sintomas?' e 'quais?'
-        // TODO: podemos usar variaveis multivaloradas aqui
         manager.addMultiOptionsQuestion("Possui outros sintomas?", "outros_sintomas");
 
-        manager.addMultiOptionsQuestion("Quando suas cólicas iniciaram?", "primeira_dismenorreia");
+        manager.addOptionsQuestion("Quando suas cólicas iniciaram?", "primeira_dismenorreia");
 
-        // TODO: podemos usar variaveis multivaloradas aqui
         manager.addMultiOptionsQuestion("Possui alguma dessas condições?", "historico_clinico");
-
-        // TODO: podemos usar variaveis multivaloradas aqui
         manager.addMultiOptionsQuestion("Já fez tratamentos prévios?", "historico_farmacoterapeutico");
 
         manager.runQuiz();
@@ -56,27 +52,27 @@ public class Main {
 
     private static void exemplAula() throws IOException {
         var manager = new QuizManager(Expert.fromFile("examplo_aula.ex"));
-        manager.addMultiOptionsQuestion("Você tem episódios de lapsos de memória?", "Lapsos");
-        manager.addMultiOptionsQuestion("Quando você descreve suas lembranças, qual o nível de detalhamento?", "Lembranças");
-        manager.addMultiOptionsQuestion("Como estão os movimentos do seu diafragma?", "Movimentos");
-        manager.addMultiOptionsQuestion("Como está a sua respiração?", "Respiração");
-        manager.addMultiOptionsQuestion("Como está a sua tosse?", "Tosse");
+        manager.addOptionsQuestion("Você tem episódios de lapsos de memória?", "Lapsos");
+        manager.addOptionsQuestion("Quando você descreve suas lembranças, qual o nível de detalhamento?", "Lembranças");
+        manager.addOptionsQuestion("Como estão os movimentos do seu diafragma?", "Movimentos");
+        manager.addOptionsQuestion("Como está a sua respiração?", "Respiração");
+        manager.addOptionsQuestion("Como está a sua tosse?", "Tosse");
         manager.runQuiz();
     }
 
     private static void presenteExample() throws IOException {
         var manager = new QuizManager(Expert.fromFile("example_numerico.ex"));
         manager.addNumericQuestion("Qual a idade do aniversariante?", "idade");
-        manager.addMultiOptionsQuestion("Qual é o sexo do aniversáriante?", "sexo");
+        manager.addOptionsQuestion("Qual é o sexo do aniversáriante?", "sexo");
         manager.runQuiz();
     }
 
     private static void qualidadeProdutoExample() throws IOException {
         var manager = new QuizManager(Expert.fromFile("example.ex"));
-        manager.addMultiOptionsQuestion("Como foi o controle de qualidade?", "controle_qualidade");
-        manager.addMultiOptionsQuestion("Como está o acabamento do produto?", "acabamento");
-        manager.addMultiOptionsQuestion("Qual a qualidade da materia prima?", "materia_prima");
-        manager.addMultiOptionsQuestion("Qual o nível do processo de fabricação?", "processo_fabricacao");
+        manager.addOptionsQuestion("Como foi o controle de qualidade?", "controle_qualidade");
+        manager.addOptionsQuestion("Como está o acabamento do produto?", "acabamento");
+        manager.addOptionsQuestion("Qual a qualidade da materia prima?", "materia_prima");
+        manager.addOptionsQuestion("Qual o nível do processo de fabricação?", "processo_fabricacao");
 
         manager.runQuiz();
     }
@@ -101,7 +97,11 @@ public class Main {
 
             quiz.onQuestionAsnwered((id, answer) -> {
                 if (answer == null) return id;
-                expert.newFact(id, answer);
+                if (answer instanceof Set<?> answers) {
+                    answers.forEach(a -> expert.newFact(id, a));
+                } else {
+                    expert.newFact(id, answer);
+                }
                 var questionOpt = expert.thinkIfNotConclusiveAskQuestion();
                 if (questionOpt.isEmpty()) {
                     runResult();
@@ -115,12 +115,17 @@ public class Main {
 
         public void addNumericQuestion(String text, String attr) {
             expert.addAskable(attr);
-            quiz.newQuestion(attr, text);
+            quiz.newNumericQuestion(attr, text);
+        }
+
+        public void addOptionsQuestion(String text, String attr) {
+            expert.addAskable(attr);
+            quiz.newOptionQuestion(attr, text, expert.getAttributesValues(attr));
         }
 
         public void addMultiOptionsQuestion(String text, String attr) {
             expert.addAskable(attr);
-            quiz.newQuestion(attr, text, expert.getAttributesValues(attr));
+            quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr));
         }
 
         private void runResult() {

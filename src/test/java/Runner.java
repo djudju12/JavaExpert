@@ -1,11 +1,9 @@
 import org.javaexpert.expert.Expert;
-import org.javaexpert.expert.fact.Fact;
-import org.javaexpert.expert.fact.NumericFact;
-import org.javaexpert.expert.fact.StringFact;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static org.javaexpert.Asserts.assertTrue;
 
@@ -42,9 +40,7 @@ public class Runner {
     }
 
     private static void setFacts(TestCase test) {
-        for (var fact: test.facts()) {
-            test.expert().newFact(fact.getName(), fact.getValue());
-        }
+        test.facts().forEach((k, v) -> test.expert().newFact(k, v));
     }
 
     private static TestCase numerics() throws IOException {
@@ -90,7 +86,7 @@ public class Runner {
     private record TestCase(
             String name,
             Expert expert,
-            Set<Fact<?>> facts,
+            Map<String, Object> facts,
             String acceptedRule
     ) {
         public static TestCaseBuilder builder() {
@@ -100,7 +96,7 @@ public class Runner {
         private static class TestCaseBuilder {
             private String testName;
             private Expert expert;
-            private final Set<Fact<?>> facts = new TreeSet<>();
+            private final Map<String, Object> facts = new HashMap<>();
             private String acceptedRule;
 
             public TestCaseBuilder testName(String name) {
@@ -113,13 +109,8 @@ public class Runner {
                 return this;
             }
 
-            public TestCaseBuilder fact(String name, String value) {
-                facts.add(new StringFact(name, value));
-                return this;
-            }
-
-            public TestCaseBuilder fact(String name, int value) {
-                facts.add(new NumericFact(name, value));
+            public TestCaseBuilder fact(String name, Object value) {
+                facts.put(name, value);
                 return this;
             }
 

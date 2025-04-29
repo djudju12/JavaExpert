@@ -9,6 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,14 +37,20 @@ public class Quiz {
         firstQuestion = question;
     }
 
-    public void newQuestion(String id, String text) {
+    public void newNumericQuestion(String id, String text) {
         var question = new NumericQuestion(id, text);
         questions.add(question);
         cards.add(question, id);
     }
 
-    public void newQuestion(String id, String text, Set<String> options) {
+    public void newOptionQuestion(String id, String text, Set<String> options) {
         var question = new OptionQuestion(id, text, options);
+        questions.add(question);
+        cards.add(question, id);
+    }
+
+    public void newMultiOptionQuestion(String id, String text, Set<String> options) {
+        var question = new MultiOptionQuestion(id, text, options);
         questions.add(question);
         cards.add(question, id);
     }
@@ -146,6 +153,20 @@ public class Quiz {
         }
     }
 
+    private List<JCheckBox> createCheckBoxes(JPanel main, ItemListener listener, Set<String> options) {
+        main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
+        var checkBoxes = new ArrayList<JCheckBox>();
+
+        options.forEach(opt -> {
+            var cb = new JCheckBox(opt);
+            checkBoxes.add(cb);
+            main.add(cb);
+            cb.addItemListener(listener);
+        });
+
+        return checkBoxes;
+    }
+
     public void onQuestionAsnwered(BiFunction<String, Object, String> function) {
         this.onQuestionAnswered = function;
     }
@@ -196,23 +217,44 @@ public class Quiz {
         }
     }
 
+    class MultiOptionQuestion extends Question implements ItemListener {
+
+        private final Set<String> selectedOptions = new HashSet<>();
+
+        MultiOptionQuestion(String id, String text, Set<String> options) {
+            super(id, text);
+            var checkBoxPanel = new JPanel();
+            createCheckBoxes(checkBoxPanel, this, options);
+            add(checkBoxPanel, BorderLayout.CENTER);
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            var select = ((JCheckBox) e.getItem()).getText();
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                selectedOptions.remove(select);
+            } else {
+                selectedOptions.add(select);
+            }
+
+            answers.put(id, selectedOptions.isEmpty() ? null : selectedOptions);
+            updateButtons();
+        }
+
+        @Override
+        void reset() {
+            selectedOptions.clear();
+        }
+    }
+
     class OptionQuestion extends Question implements ItemListener {
 
-        private final List<JCheckBox> checkBoxes = new ArrayList<>();
+        private final List<JCheckBox> checkBoxes;
 
         OptionQuestion(String id, String text, Set<String> options) {
             super(id, text);
-
             var checkBoxPanel = new JPanel();
-            checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
-
-            options.forEach(opt -> {
-                var cb = new JCheckBox(opt);
-                checkBoxes.add(cb);
-                checkBoxPanel.add(cb);
-                cb.addItemListener(this);
-            });
-
+            checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
             add(checkBoxPanel, BorderLayout.CENTER);
         }
 
@@ -251,7 +293,6 @@ public class Quiz {
             var questionLabel = new JLabel(text);
             add(questionLabel, BorderLayout.NORTH);
         }
-
 
         abstract void reset();
     }

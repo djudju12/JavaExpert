@@ -5,7 +5,7 @@ import org.javaexpert.expert.predicate.Predicate;
 
 import java.util.Set;
 
-public record Rule(String name, Predicate predicate, Set<Fact<?>> conclusions) implements Comparable<Rule> {
+public record Rule(String name, Predicate predicate, Set<Fact> conclusions) implements Comparable<Rule> {
 
     @Override
     public int compareTo(Rule o) {

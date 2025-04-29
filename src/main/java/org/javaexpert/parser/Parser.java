@@ -113,8 +113,8 @@ public class Parser {
         };
     }
 
-    private Set<Fact<?>> parseEntao() {
-        var conclusions = new TreeSet<Fact<?>>();
+    private Set<Fact> parseEntao() {
+        var conclusions = new TreeSet<Fact>();
 
         do conclusions.add(parseFact());
         while (lexer.requireNextToken().isAND());
@@ -156,7 +156,7 @@ public class Parser {
         };
     }
 
-    private Fact<?> parseFact() {
+    private Fact parseFact() {
         var attributeName = parseAttrName();
         var token = lexer.requireNextToken(LOGIC_OPERATOR);
         assertTrue(token.valueLogicOp() == LogicOperator.EQ, "invalid fact operator. Must be a '='", token.location());

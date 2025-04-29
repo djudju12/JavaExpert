@@ -1,6 +1,8 @@
 package org.javaexpert.expert.predicate;
 
 import org.javaexpert.expert.fact.Fact;
+import org.javaexpert.expert.fact.StringFact;
+
 
 public record StringPredicate(
         String name,
@@ -14,11 +16,15 @@ public record StringPredicate(
     }
 
     @Override
-    public boolean validateFact(Fact<?> fact) {
-        return switch (operator) {
-            case EQ -> value().equals(fact.getValue());
-            case NEQ -> !value().equals(fact.getValue());
-            default -> throw new IllegalStateException("Operator between string must be '=' or '<>'");
-        };
+    public boolean validateFact(Fact fact) {
+        if (fact instanceof StringFact strFact) {
+            return switch (operator) {
+                case EQ -> strFact.value().contains(value());
+                case NEQ -> !strFact.value().contains(value());
+                default -> throw new IllegalStateException("Operator between string must be '=' or '<>'");
+            };
+        }
+
+        return false;
     }
 }

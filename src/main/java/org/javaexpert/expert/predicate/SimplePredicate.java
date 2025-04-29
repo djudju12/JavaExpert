@@ -8,6 +8,6 @@ public sealed interface SimplePredicate extends Predicate permits StringPredicat
     Object value();
     LogicOperator operator();
 
-    boolean validateFact(Fact<?> fact);
+    boolean validateFact(Fact fact);
 
 }

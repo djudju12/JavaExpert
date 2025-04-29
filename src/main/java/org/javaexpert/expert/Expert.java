@@ -32,7 +32,7 @@ public class Expert {
     private final Map<String, Attribute> attributes;
     private final Set<String> objectives;
     private final List<Rule> conclusiveRules;
-    private final Map<String, Fact<?>> facts = new TreeMap<>();
+    private final Map<String, Fact> facts = new TreeMap<>();
     private final StringBuilder log = new StringBuilder();
     private final TreeLogger tree;
     private String question = null;
@@ -52,20 +52,14 @@ public class Expert {
         return new Parser(filePath).parse();
     }
 
-    public Map<String, Object> getFacts() {
-        return facts.values()
-                .stream()
-                .collect(Collectors.toMap(Fact::getName, Fact::getValue));
+    public Set<Fact> getFacts() {
+        return new TreeSet<>(facts.values());
     }
 
-    public Map<String, Object> getObjectivesConclusions() {
-        Map<String, Object> m = HashMap.newHashMap(objectives.size());
-        objectives.forEach(o -> m.put(o, unwrapFactValue(facts.get(o))));
+    public Map<String, Fact> getObjectivesConclusions() {
+        Map<String, Fact> m = HashMap.newHashMap(objectives.size());
+        objectives.forEach(o -> m.put(o, facts.get(o)));
         return m;
-    }
-
-    private static Object unwrapFactValue(Fact<?> fact) {
-        return fact == null? "DESCONHECIDO" : fact.getValue();
     }
 
     public Set<String> getAttributesValues(String attrName) {
@@ -171,7 +165,7 @@ public class Expert {
         for (var rule: rules) {
             var isAboutPredicate = rule.conclusions()
                     .stream()
-                    .anyMatch(f -> f.getName().equals(simple.name()));
+                    .anyMatch(f -> f.name().equals(simple.name()));
 
             if (isAboutPredicate && verifyRule(rule, rules, parent)) {
                 return true;
@@ -202,8 +196,12 @@ public class Expert {
         if (isRuleTrue) {
             var then = tree.appendf(child, "REGRA '%s' APLICADA", rule.name());
             rule.conclusions().forEach(f -> {
-                tree.appendf(then, "'%s' := '%s'", f.getName(), f.getValue());
-                facts.putIfAbsent(f.getName(), f);
+                if (f instanceof StringFact stringFact) {
+                    stringFact.value().forEach(v -> tree.appendf(then, "'%s' := '%s'", f.name(), v));
+                } else {
+                    tree.appendf(then, "'%s' := '%s'", f.name(), f.value());
+                }
+                facts.putIfAbsent(f.name(), f);
             });
 
         } else {
@@ -217,14 +215,15 @@ public class Expert {
         return log.toString();
     }
 
-    public <T> void newFact(String attrName, T value) {
+    public void newFact(String attrName, Object value) {
         var attr = attributes.get(attrName);
         assertNotNull(attr, "attribute '%s' not found".formatted(attrName));
         if (attr instanceof NumericAttribute) {
             facts.put(attrName, new NumericFact(attrName, (int) value));
         } else if (attr instanceof StringAttribute strAttr) {
             assertTrue(strAttr.values().contains((String) value), "invalid fact. '%s' is not a valid value for '%s'".formatted(value, attrName));
-            facts.put(attrName, new StringFact(attrName, (String) value));
+            var strFact = (StringFact) facts.computeIfAbsent(attrName, k -> new StringFact(k, new HashSet<>()));
+            strFact.value().add((String) value);
         } else {
             throw new IllegalStateException("invalid fact. Attribute '%s' is not a number or string".formatted(attrName));
         }
@@ -234,7 +233,7 @@ public class Expert {
         return rules
             .stream()
             .filter(rule -> {
-                var conclusionNames = rule.conclusions().stream().map(Fact::getName).collect(Collectors.toSet());
+                var conclusionNames = rule.conclusions().stream().map(Fact::name).collect(Collectors.toSet());
                 return conclusionNames.stream().anyMatch(objectives::contains);
             })
             .toList();

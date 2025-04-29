@@ -1,7 +1,3 @@
 package org.javaexpert.expert.fact;
 
-public class NumericFact extends Fact<Integer> {
-    public NumericFact(String name, int value) {
-        super(name, value);
-    }
-}
+public record NumericFact (String name, Integer value) implements Fact { }

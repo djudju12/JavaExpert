@@ -1,7 +1,11 @@
 package org.javaexpert.expert.fact;
 
-public class StringFact extends Fact<String> {
-    public StringFact(String name, String value) {
-        super(name, value);
+import java.util.HashSet;
+import java.util.Set;
+
+public record StringFact(String name, Set<String> value) implements Fact {
+    public StringFact(String name, String s) {
+        this(name, new HashSet<>());
+        value().add(s);
     }
 }

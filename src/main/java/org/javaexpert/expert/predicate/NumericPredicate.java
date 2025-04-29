@@ -1,7 +1,6 @@
 package org.javaexpert.expert.predicate;
 
 import org.javaexpert.expert.fact.Fact;
-import org.javaexpert.expert.fact.NumericFact;
 
 public record NumericPredicate(
         String name,
@@ -15,18 +14,15 @@ public record NumericPredicate(
     }
 
     @Override
-    public boolean validateFact(Fact<?> fact) {
-        if (fact instanceof NumericFact numFact) {
-            return switch (operator()) {
-                case EQ -> numFact.getValue().equals(value());
-                case NEQ -> !numFact.getValue().equals(value());
-                case GT -> numFact.getValue() > value();
-                case GTE -> numFact.getValue() >= value();
-                case LT -> numFact.getValue() < value();
-                case LTE -> numFact.getValue() <= value();
-            };
-        } else {
-            throw new IllegalStateException("inconsistency between facts and rules");
-        }
+    public boolean validateFact(Fact fact) {
+        var factValue = (int) fact.value();
+        return switch (operator()) {
+            case EQ -> factValue == value();
+            case NEQ -> factValue != value();
+            case GT -> factValue > value();
+            case GTE -> factValue >= value();
+            case LT -> factValue < value();
+            case LTE -> factValue <= value();
+        };
     }
 }
