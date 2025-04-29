@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.setProperty("awt.useSystemAAFontSettings", "on");
-        setUIFont(new javax.swing.plaf.FontUIResource("Monospaced", Font.PLAIN, 14));
+        setUIFont(new javax.swing.plaf.FontUIResource("SansSerif", Font.PLAIN, 16));
 
         decisaoProblemaSaudeAutodelimitado_desmenorreia();
 

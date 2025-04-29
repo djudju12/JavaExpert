@@ -28,6 +28,8 @@ public class Result {
     private final Set<Fact> allFacts; // attrName -> attrValue
     private final Map<String, Fact> objectives; // attrName -> attrValue
 
+    private static final Font monospacedFont = new Font("Monospaced", Font.PLAIN, 14);
+
     static {
         StyleConstants.setForeground(addStyle("red"), Color.RED);
         StyleConstants.setForeground(addStyle("blue"), Color.BLUE);
@@ -212,6 +214,7 @@ public class Result {
         textComponent.setSize(300, 300);
         textComponent.setEditable(false);
         textComponent.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        textComponent.setFont(monospacedFont);
 
         var scrollPane = new JScrollPane(textComponent);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);

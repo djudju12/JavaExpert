@@ -164,6 +164,8 @@ public class Quiz {
 
         options.forEach(opt -> {
             var cb = new JCheckBox(opt);
+            cb.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+            cb.setBorderPainted(true);
             checkBoxes.add(cb);
             main.add(cb);
             cb.addItemListener(listener);
@@ -297,6 +299,8 @@ public class Quiz {
             this.id = id;
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             var questionLabel = new JLabel(text);
+            questionLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
+            questionLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
             add(questionLabel, BorderLayout.NORTH);
         }
 
