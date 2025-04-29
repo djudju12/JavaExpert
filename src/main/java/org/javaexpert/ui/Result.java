@@ -158,7 +158,7 @@ public class Result {
             return String.join(",", strFact.value());
         }
 
-        return (String) fact.value();
+        return fact.value().toString();
     }
 
     private JComponent makeSystemPanel(String system) {
@@ -237,9 +237,9 @@ public class Result {
         frame.setResizable(true);
 
         addComponentToPane(frame.getContentPane());
-        frame.pack();
+//        frame.pack();
+        frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
-//        frame.setSize(500, 500);
         frame.setVisible(true);
     }
 
