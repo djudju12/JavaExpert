@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import static org.javaexpert.Asserts.assertFalse;
 import static org.javaexpert.Asserts.assertNotNull;
 import static org.javaexpert.Asserts.assertTrue;
 import static org.javaexpert.parser.Token.TokenType.CLOSE_PAR;
@@ -116,7 +117,21 @@ public class Parser {
     private Set<Fact> parseEntao() {
         var conclusions = new TreeSet<Fact>();
 
-        do conclusions.add(parseFact());
+        do {
+            var fact = parseFact();
+            if (fact instanceof StringFact sf) {
+                conclusions.stream()
+                        .filter(StringFact.class::isInstance)
+                        .filter(f -> f.name().equals(fact.name()))
+                        .findFirst()
+                        .ifPresentOrElse(
+                            f -> ((StringFact) f).value().addAll(sf.value()),
+                            () -> conclusions.add(fact)
+                        );
+            } else {
+                conclusions.add(fact);
+            }
+        }
         while (lexer.requireNextToken().isAND());
 
         lexer.assertLastToken(CLOSE_PAR);
@@ -152,6 +167,7 @@ public class Parser {
     private Predicate parseSimplePredicate() {
         var attributeName = parseAttrName();
         var attr = attrs.get(attributeName);
+        assertNotNull(attr, "attribute '%s' not found".formatted(attributeName), lexer.getLastToken().location());
         var optoken = lexer.requireNextToken(LOGIC_OPERATOR);
         var op = optoken.valueLogicOp();
         var token = lexer.requireNextToken();
@@ -176,9 +192,22 @@ public class Parser {
         var attributeName = parseAttrName();
         var token = lexer.requireNextToken(LOGIC_OPERATOR);
         assertTrue(token.valueLogicOp() == LogicOperator.EQ, "invalid fact operator. Must be a '='", token.location());
+        var attr = attrs.get(attributeName);
+        assertNotNull(attr, "attribute '%s' not found".formatted(attributeName), lexer.getLastToken().location());
         token = lexer.requireNextToken();
+
         return switch (token.type()) {
-            case STR -> new StringFact(attributeName, token.valueStr());
+            case STR -> {
+                if (attr instanceof StringAttribute stringAttribute) {
+                    assertTrue(
+                        stringAttribute.contains(token.valueStr()),
+                        "attribute '%s' does not contains value '%s'".formatted(attributeName, token.valueStr()),
+                        token.location()
+                    );
+                    yield new StringFact(attributeName, token.valueStr());
+                }
+                throw new UnexpectedTokenException(token);
+            }
             case NUM -> new NumericFact(attributeName, token.valueInt());
             default -> throw new UnexpectedTokenException(token);
         };
@@ -187,9 +216,9 @@ public class Parser {
     private String parseAttrName() {
         lexer.assertLastToken(STR);
         var token = lexer.getLastToken();
-        var attributeName = token.valueStr();
-        var attr = attrs.get(attributeName);
-        assertNotNull(attr, "attribute '%s' not found".formatted(attributeName), token.location());
-        return attributeName;
+        return token.valueStr();
+//        var attr = attrs.get(attributeName);
+//        assertNotNull(attr, "attribute '%s' not found".formatted(attributeName), token.location());
+//        return attributeName;
     }
 }
