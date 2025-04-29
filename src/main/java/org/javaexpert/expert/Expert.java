@@ -62,8 +62,8 @@ public class Expert {
         return m;
     }
 
-    public Set<String> getAttributesValues(String attrName) {
-        if (attributes.get(attrName) instanceof StringAttribute strAttr) return strAttr.values();
+    public List<String> getAttributesValues(String attrName) {
+        if (attributes.get(attrName) instanceof StringAttribute strAttr) return strAttr.getOrderedValues();
         throw new IllegalStateException("string attribute %s not found".formatted(attrName));
     }
 
@@ -221,7 +221,7 @@ public class Expert {
         if (attr instanceof NumericAttribute) {
             facts.put(attrName, new NumericFact(attrName, (int) value));
         } else if (attr instanceof StringAttribute strAttr) {
-            assertTrue(strAttr.values().contains((String) value), "invalid fact. '%s' is not a valid value for '%s'".formatted(value, attrName));
+            assertTrue(strAttr.contains((String) value), "invalid fact. '%s' is not a valid value for '%s'".formatted(value, attrName));
             var strFact = (StringFact) facts.computeIfAbsent(attrName, k -> new StringFact(k, new HashSet<>()));
             strFact.value().add((String) value);
         } else {

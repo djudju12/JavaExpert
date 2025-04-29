@@ -102,7 +102,7 @@ public class Parser {
                 var attr = new StringAttribute(name);
                 do {
                     token = lexer.requireNextToken(STR);
-                    attr.values().add(token.valueStr());
+                    attr.addValue(token.valueStr());
                 } while (lexer.requireNextToken().type() == COMMA);
 
                 lexer.assertLastToken(CLOSE_PAR);

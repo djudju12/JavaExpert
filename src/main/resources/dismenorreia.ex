@@ -8,29 +8,29 @@
 // -------------------- Atributos --------------------
 
 // Início das dores
-ATRIBUTO "dor_inicio" TEXTO ("2 dias antes da menstruação", "sem relação temporal com a menstruação") // Pergunta
+ATRIBUTO "dor_inicio" TEXTO ("2 dias antes da menstruação", "Sem relação temporal com a menstruação") // Pergunta
 
 // Características dos sintomas
 // TODO: 'caracteristica_dor' pode ser separada em duas regras?
-ATRIBUTO "caracteristica_dor" TEXTO ("cólica fora do período menstrual", "cólica durante o período menstrual", "unilateral") // Pergunta
-ATRIBUTO "alteracao_do_local" TEXTO ("sim", "não") // Pergunta
+ATRIBUTO "caracteristica_dor" TEXTO ("Cólica fora do período menstrual", "cólica durante o período menstrual", "unilateral") // Pergunta
+ATRIBUTO "alteracao_do_local" TEXTO ("Sim", "Não") // Pergunta
 
-ATRIBUTO "caracteristicas_incomuns" TEXTO ("sim", "não") // Intermediário
+ATRIBUTO "caracteristicas_incomuns" TEXTO ("Sim", "Não") // Intermediário
 
 // Intensidade das dores
 ATRIBUTO "intesidade_dor" TEXTO (
-  "Dor intensa que incapacita para a realização das atividades diárias",
   "Dor leve a moderada",
+  "Dor intensa que incapacita para a realização das atividades diárias",
   "Dor intensa que melhoram com anti-inflamatório"
 ) // Pergunta
 
 // Dor associada com a menstruação
-ATRIBUTO "dor_associada_menstruacao" TEXTO ("sim", "não") // Pergunta
+ATRIBUTO "dor_associada_menstruacao" TEXTO ("Sim", "Não") // Pergunta
 
-// Outros sintomas (graves ou não)
+// Outros sintomas (graves ou Não)
 ATRIBUTO "outros_sintomas" TEXTO
 (
-  "Não", // TODO: Separar o 'não em outra regra e nem perguntar dos sintomas em caso de 'não'
+  "Não", // TODO: Separar o 'Não em outra regra e nem perguntar dos sintomas em caso de 'Não'
   "Mal-estar",
   "Dor nas costas",
   "Dor na coxa",
@@ -42,7 +42,7 @@ ATRIBUTO "outros_sintomas" TEXTO
   "Menorragia, oligomenorreia, sangramento no período intermenstrual"
 ) // Pergunta
 
-ATRIBUTO "sintomas_graves" TEXTO ("sim", "não")
+ATRIBUTO "sintomas_graves" TEXTO ("Sim", "Não")
 
 // Primeira dismenorreia
 ATRIBUTO "primeira_dismenorreia" TEXTO (
@@ -61,7 +61,7 @@ ATRIBUTO "historico_clinico" TEXTO (
   "Nenhuma"
 ) // Pergunta
 
-ATRIBUTO "possui_historico_clinico_relevante" TEXTO ("sim", "não")
+ATRIBUTO "possui_historico_clinico_relevante" TEXTO ("Sim", "Não")
 
 // Historico Farmacoterapeutico
 ATRIBUTO "historico_farmacoterapeutico" TEXTO (
@@ -71,7 +71,7 @@ ATRIBUTO "historico_farmacoterapeutico" TEXTO (
   "Nenhum"
 ) // Pergunta
 
-ATRIBUTO "possui_historico_farmacoterapeutico_relevante" TEXTO ("sim", "não")
+ATRIBUTO "possui_historico_farmacoterapeutico_relevante" TEXTO ("Sim", "Não")
 
 
 // -------------------- Objetivos --------------------
@@ -85,18 +85,18 @@ REGRA "caracteristicas_sao_incomuns" (
   SE
        "caracteristica_dor" = "suprapúbica fora do período menstrual"
     OU "caracteristica_dor" = "unilateral"
-    OU "alteracao_do_local" = "sim"
+    OU "alteracao_do_local" = "Sim"
   ENTAO
-    "caracteristicas_incomuns" = "sim"
+    "caracteristicas_incomuns" = "Sim"
 )
 
 REGRA "caracteristicas_nao_sao_incomuns" (
   SE
       "caracteristica_dor" <> "suprapúbica fora do período menstrual"
-    E "alteracao_do_local" <> "sim"
+    E "alteracao_do_local" <> "Sim"
     E "caracteristica_dor" <> "unilateral"
   ENTAO
-      "caracteristicas_incomuns" = "não"
+      "caracteristicas_incomuns" = "Não"
 )
 
 REGRA "sintomas_sao_graves" (
@@ -108,17 +108,17 @@ REGRA "sintomas_sao_graves" (
     OU "outros_sintomas" = "Alterações do sistema urinário, como dor ao urinar, urgência miccional e/ou presença de sangue na urina"
     OU "outros_sintomas" = "Menorragia, oligomenorreia, sangramento no período intermenstrual"
   ENTAO
-      "sintomas_graves" = "sim"
+      "sintomas_graves" = "Sim"
 )
 
 REGRA "sintomas_nao_sao_graves" (
   SE
-      "outros_sintomas" <> "Dor abdominal associada à diarreia, náuseas, vômitos ou queimação"
-    E "outros_sintomas" <> "Dor periumbilical que irradia para o quadrante inferior direito"
-    E "outros_sintomas" <> "Dor suprapúbica, associada à urgência urinária e/ou hematúria, independentemente da menstruação"
-    E "outros_sintomas" <> "Cefaleia vascular frequente ou intensa"
-    E "outros_sintomas" <> "Alterações do sistema urinário, como dor ao urinar, urgência miccional e/ou presença de sangue na urina"
-    E "outros_sintomas" <> "Menorragia, oligomenorreia, sangramento no período intermenstrual"
+       "outros_sintomas" <> "Dor abdominal associada à diarreia, náuseas, vômitos ou queimação"
+    E  "outros_sintomas" <> "Dor periumbilical que irradia para o quadrante inferior direito"
+    E  "outros_sintomas" <> "Dor suprapúbica, associada à urgência urinária e/ou hematúria, independentemente da menstruação"
+    E  "outros_sintomas" <> "Cefaleia vascular frequente ou intensa"
+    E  "outros_sintomas" <> "Alterações do sistema urinário, como dor ao urinar, urgência miccional e/ou presença de sangue na urina"
+    E  "outros_sintomas" <> "Menorragia, oligomenorreia, sangramento no período intermenstrual"
   ENTAO
       "sintomas_graves" = "nao"
 )
@@ -132,7 +132,7 @@ REGRA "historico_clinico_relavante" (
     OU "historico_clinico" = "Asma"
     OU "historico_clinico" = "Bronquite"
   ENTAO
-    "possui_historico_clinico_relevante" = "sim"
+    "possui_historico_clinico_relevante" = "Sim"
 )
 
 REGRA "historico_clinico_nao_relavante" (
@@ -144,7 +144,7 @@ REGRA "historico_clinico_nao_relavante" (
     E "historico_clinico" <> "Asma"
     E "historico_clinico" <> "Bronquite"
   ENTAO
-    "possui_historico_clinico_relevante" = "não"
+    "possui_historico_clinico_relevante" = "Não"
 )
 
 REGRA "possui_historico_farmacoterapeutico_relevante" (
@@ -153,7 +153,7 @@ REGRA "possui_historico_farmacoterapeutico_relevante" (
     OU "historico_farmacoterapeutico" = "Tratamentos concomitantes com falha terapêutica"
     OU "historico_farmacoterapeutico" = "Tratamentos com reações adversas"
   ENTAO
-    "possui_historico_farmacoterapeutico_relevante" = "sim"
+    "possui_historico_farmacoterapeutico_relevante" = "Sim"
 )
 
 REGRA "possui_historico_farmacoteraputico_nao_relevante" (
@@ -162,7 +162,7 @@ REGRA "possui_historico_farmacoteraputico_nao_relevante" (
     E "historico_farmacoterapeutico" <> "Tratamentos concomitantes com falha terapêutica"
     E "historico_farmacoterapeutico" <> "Tratamentos com reações adversas"
   ENTAO
-    "possui_historico_farmacoterapeutico_relevante" = "não"
+    "possui_historico_farmacoterapeutico_relevante" = "Não"
 )
 
 // -------------------- Regras conclusivas --------------------
@@ -170,13 +170,13 @@ REGRA "possui_historico_farmacoteraputico_nao_relevante" (
 REGRA "deve_encaminhar" (
   SE
        "dor_inicio" <> "2 dias antes da menstruação"
-    OU "caracteristicas_incomuns" = "sim"
+    OU "caracteristicas_incomuns" = "Sim"
     OU "intesidade_dor" = "Dor intensa que incapacita para a realização das atividades diárias"
-    OU "dor_associada_menstruacao" = "não"
-    OU "sintomas_graves" = "sim"
+    OU "dor_associada_menstruacao" = "Não"
+    OU "sintomas_graves" = "Sim"
     OU "primeira_dismenorreia" = "Início dos sinais/sintomas após 25 anos de idade (30 a 40 anos)"
-    OU "possui_historico_clinico_relevante" = "sim"
-    OU "possui_historico_farmacoterapeutico_relevante" = "sim"
+    OU "possui_historico_clinico_relevante" = "Sim"
+    OU "possui_historico_farmacoterapeutico_relevante" = "Sim"
   ENTAO
       "decisao" = "encaminhar"
 )
@@ -184,13 +184,13 @@ REGRA "deve_encaminhar" (
 REGRA "problema_autodelimitado" (
   SE
       "dor_inicio" = "2 dias antes da menstruação"
-    E "caracteristicas_incomuns" <> "sim"
+    E "caracteristicas_incomuns" = "Não"
     E "intesidade_dor" <> "Dor intensa que incapacita para a realização das atividades diárias"
-    E "dor_associada_menstruacao" <> "não"
-    E "sintomas_graves" <> "sim"
+    E "dor_associada_menstruacao" = "Sim"
+    E "sintomas_graves" = "Não"
     E "primeira_dismenorreia" <> "Início dos sinais/sintomas após 25 anos de idade (30 a 40 anos)"
-    E "possui_historico_clinico_relevante" <> "sim"
-    E "possui_historico_farmacoterapeutico_relevante" <> "sim"
+    E "possui_historico_clinico_relevante" = "Não"
+    E "possui_historico_farmacoterapeutico_relevante" = "Não"
   ENTAO
       "decisao" = "autodelimitado"
 )

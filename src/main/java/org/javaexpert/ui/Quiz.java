@@ -43,13 +43,13 @@ public class Quiz {
         cards.add(question, id);
     }
 
-    public void newOptionQuestion(String id, String text, Set<String> options) {
+    public void newOptionQuestion(String id, String text, List<String> options) {
         var question = new OptionQuestion(id, text, options);
         questions.add(question);
         cards.add(question, id);
     }
 
-    public void newMultiOptionQuestion(String id, String text, Set<String> options) {
+    public void newMultiOptionQuestion(String id, String text, List<String> options) {
         var question = new MultiOptionQuestion(id, text, options);
         questions.add(question);
         cards.add(question, id);
@@ -153,7 +153,7 @@ public class Quiz {
         }
     }
 
-    private List<JCheckBox> createCheckBoxes(JPanel main, ItemListener listener, Set<String> options) {
+    private List<JCheckBox> createCheckBoxes(JPanel main, ItemListener listener, List<String> options) {
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
         var checkBoxes = new ArrayList<JCheckBox>();
 
@@ -221,7 +221,7 @@ public class Quiz {
 
         private final Set<String> selectedOptions = new HashSet<>();
 
-        MultiOptionQuestion(String id, String text, Set<String> options) {
+        MultiOptionQuestion(String id, String text, List<String> options) {
             super(id, text);
             var checkBoxPanel = new JPanel();
             createCheckBoxes(checkBoxPanel, this, options);
@@ -251,7 +251,7 @@ public class Quiz {
 
         private final List<JCheckBox> checkBoxes;
 
-        OptionQuestion(String id, String text, Set<String> options) {
+        OptionQuestion(String id, String text, List<String> options) {
             super(id, text);
             var checkBoxPanel = new JPanel();
             checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
