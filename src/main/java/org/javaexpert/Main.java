@@ -18,7 +18,6 @@ public class Main {
         setUIFont(new javax.swing.plaf.FontUIResource("SansSerif", Font.PLAIN, 16));
 
         decisaoProblemaSaudeAutodelimitado_desmenorreia();
-
 //        qualidadeProdutoExample();
 //        presenteExample();
 //        exemplAula();

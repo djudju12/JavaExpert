@@ -20,6 +20,11 @@ import java.util.function.BiFunction;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Quiz {
+
+    private final static int WIDTH = 720;
+    private final static int HEIGHT = 400;
+    private final static int TEXT_WIDTH = Quiz.WIDTH - 20*5 - 70;
+
     private JFrame frame;
     private final String title;
 
@@ -83,7 +88,7 @@ public class Quiz {
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setResizable(false);
         addComponentToPane(frame.getContentPane());
-        frame.pack();
+        frame.setSize(WIDTH, HEIGHT);
         return frame;
     }
 
@@ -103,8 +108,9 @@ public class Quiz {
 
     private void addComponentToPane(Container pane) {
         var buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
         buttonPanel.add(backButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(5, 1)));
         buttonPanel.add(nextButton);
 
         backButton.addActionListener(_ -> {
@@ -166,18 +172,33 @@ public class Quiz {
         }
     }
 
-    private List<JCheckBox> createCheckBoxes(JPanel main, ItemListener listener, List<String> options) {
+    private Map<JCheckBox, String> createCheckBoxes(JScrollPane scrollPane, ItemListener listener, List<String> options) {
+        var bg = new Color(245, 245, 245);
+        var main = new JPanel();
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
-        var checkBoxes = new ArrayList<JCheckBox>();
+        var checkBoxes = new HashMap<JCheckBox, String>();
 
         options.forEach(opt -> {
             var cb = new JCheckBox(opt);
-            cb.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+            cb.setText("<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH - 50, opt));
+            cb.setBorder(BorderFactory.createEmptyBorder(0, 10, 20, 0));
+            cb.setBackground(bg);
             cb.setBorderPainted(true);
-            checkBoxes.add(cb);
+            checkBoxes.put(cb, opt);
             main.add(cb);
             cb.addItemListener(listener);
         });
+
+        scrollPane.setViewportView(main);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 0, 20),
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true)
+        ));
+        main.setBackground(bg);
+
+        main.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
 
         return checkBoxes;
     }
@@ -235,7 +256,7 @@ public class Quiz {
     class MultiOptionQuestion extends Question implements ItemListener {
 
         private final Set<String> selectedOptions = new HashSet<>();
-        private final List<JCheckBox> checkBoxes;
+        private final Map<JCheckBox, String> checkBoxes;
         private final String exclusiveOption;
 
         MultiOptionQuestion(String id, String text, List<String> options) {
@@ -246,25 +267,27 @@ public class Quiz {
             super(id, text);
             assert options.contains(exclusiveOption);
             this.exclusiveOption = exclusiveOption;
-            var checkBoxPanel = new JPanel();
+            var checkBoxPanel = new JScrollPane();
             checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
             add(checkBoxPanel, BorderLayout.CENTER);
         }
 
         @Override
         public void itemStateChanged(ItemEvent e) {
-            var select = ((JCheckBox) e.getItem()).getText();
+            var cb = (JCheckBox) e.getItem();
+            var select = checkBoxes.get(cb);
             if (e.getStateChange() == ItemEvent.DESELECTED) {
                 selectedOptions.remove(select);
                 if (Objects.equals(select, exclusiveOption)) {
-                    checkBoxes.forEach(cb -> cb.setEnabled(true));
+                    checkBoxes.keySet().forEach(otherCb -> otherCb.setEnabled(true));
                 }
             } else {
                 if (exclusiveOption != null && Objects.equals(select, exclusiveOption)) {
-                    checkBoxes.forEach(cb -> {
-                        if (!cb.getText().equals(select)) {
-                            cb.setSelected(false);
-                            cb.setEnabled(false);
+                    checkBoxes.keySet().forEach(otherCb -> {
+                        var otherCbText = checkBoxes.get(otherCb);
+                        if (!otherCbText.equals(select)) {
+                            otherCb.setSelected(false);
+                            otherCb.setEnabled(false);
                         }
                     });
                 }
@@ -278,19 +301,19 @@ public class Quiz {
 
         @Override
         void reset() {
-            checkBoxes.forEach(cb -> cb.setSelected(false));
+            checkBoxes.keySet().forEach(cb -> cb.setSelected(false));
         }
     }
 
     class OptionQuestion extends Question implements ItemListener {
 
-        private final List<JCheckBox> checkBoxes;
+        private final Map<JCheckBox, String> checkBoxes;
 
         OptionQuestion(String id, String text, List<String> options) {
             super(id, text);
-            var checkBoxPanel = new JPanel();
-            checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
-            add(checkBoxPanel, BorderLayout.CENTER);
+            var scrollPane = new JScrollPane();
+            checkBoxes = createCheckBoxes(scrollPane, this, options);
+            add(scrollPane, BorderLayout.CENTER);
         }
 
         @Override
@@ -298,14 +321,16 @@ public class Quiz {
             if (e.getStateChange() == ItemEvent.DESELECTED) {
                 answers.put(this.id, null);
             } else {
-                for (var cb: checkBoxes) {
+                for (var cb: checkBoxes.keySet()) {
                     var selectedCb = e.getItemSelectable();
                     if (cb != selectedCb && cb.isSelected()) {
                         cb.setSelected(false);
                     }
                 }
 
-                answers.put(this.id, ((JCheckBox) e.getItem()).getText());
+                var cb =  ((JCheckBox) e.getItem());
+                var text = checkBoxes.get(cb);
+                answers.put(this.id, text);
             }
 
             updateButtons();
@@ -313,7 +338,7 @@ public class Quiz {
 
         @Override
         void reset() {
-            checkBoxes.forEach(cb -> cb.setSelected(false));
+            checkBoxes.keySet().forEach(cb -> cb.setSelected(false));
         }
     }
 
@@ -324,9 +349,12 @@ public class Quiz {
         Question(String id, String text) {
             super(new BorderLayout(20, 20));
             this.id = id;
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            var questionLabel = new JLabel(text);
-            questionLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
+            setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
+
+            var questionLabel = new JLabel(
+                    "<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH, text)
+            );
+
             questionLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
             add(questionLabel, BorderLayout.NORTH);
         }

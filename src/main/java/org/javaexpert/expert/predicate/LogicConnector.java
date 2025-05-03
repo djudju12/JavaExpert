@@ -14,11 +14,3 @@ public enum LogicConnector {
         return format;
     }
 }
-
-/*
-> REGRA 'R5':
-|--> 'durabilidade': 'baixa' = 'baixa'?     [VERDADEIRO]
-|--> OU...
-`--> REGRA 'R5' APLICADA
-|  `--> 'qualidade_final' := 'rejeitavel'
-*/
