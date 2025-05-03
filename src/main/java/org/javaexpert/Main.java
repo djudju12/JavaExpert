@@ -19,7 +19,6 @@ public class Main {
 
         decisaoProblemaSaudeAutodelimitado_desmenorreia();
 
-
 //        qualidadeProdutoExample();
 //        presenteExample();
 //        exemplAula();
@@ -28,25 +27,20 @@ public class Main {
     private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
         var manager = new QuizManager("Problema de Saúde Autodelimitado: Dismenorreia", Expert.fromFile("dismenorreia.ex"));
 
-        manager.addOptionsQuestion("Quando as dores se iniciam?", "dor_inicio");
+        manager.addOptionsQuestion("Qual é a relação temporal entre o início da dor e o ciclo menstrual?", "dor_inicio");
 
-        // TODO: criar uma questão melhor
-        // TODO: separar 'unilateral' em outra questão?
-        manager.addOptionsQuestion("Caracteristicas da dor?", "caracteristica_dor");
-        manager.addOptionsQuestion("Houve alteração do local da dor?", "alteracao_do_local");
+        manager.addOptionsQuestion("Como se caracteriza a dor do paciente?", "caracteristica_dor");
+        manager.addOptionsQuestion("Durante os ciclos menstruais, há alteração do local da dor?", "alteracao_do_local");
 
-        manager.addOptionsQuestion("Qual é a intensidade da dor?", "intesidade_dor");
+        manager.addOptionsQuestion("Como o paciente descreve a intensidade da dor?", "intesidade_dor");
 
-        manager.addOptionsQuestion("Os sintomas estão associados à menstruação?", "dor_associada_menstruacao");
+        manager.addOptionsQuestion("Além da dor, há outros sintomas relevantes no quadro clínico?", "possui_outros_sintomas");
+        manager.addMultiOptionsQuestion("O paciente apresenta algum dos seguintes sintomas associados?", "outros_sintomas");
 
-        // TODO: separar em 'possui outros sintomas?' e 'quais?'
-        manager.addOptionsQuestion("Possui outros sintomas?", "possui_outros_sintomas");
-        manager.addMultiOptionsQuestion("O paciente apresenta algum desses sintomas?", "outros_sintomas");
+        manager.addOptionsQuestion("Qual foi a idade ou período em que surgiram as primeiras cólicas menstruais?", "primeira_dismenorreia");
 
-        manager.addOptionsQuestion("Quando suas cólicas iniciaram?", "primeira_dismenorreia");
-
-        manager.addMultiOptionsQuestion("Possui alguma dessas condições?", "historico_clinico");
-        manager.addMultiOptionsQuestion("Já fez tratamentos prévios?", "historico_farmacoterapeutico");
+        manager.addMultiOptionsQuestion("O paciente possui histórico de alguma das seguintes condições clínicas?", "historico_clinico");
+        manager.addMultiOptionsQuestion("O paciente já tentou tratamento recente para os sintomas?", "historico_farmacoterapeutico");
 
         manager.runQuiz();
     }
