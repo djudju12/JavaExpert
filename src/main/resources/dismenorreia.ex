@@ -65,7 +65,7 @@ ATRIBUTO "historico_clinico" TEXTO (
   "Doença gastrointestinal",
   "Asma",
   "Bronquite",
-  "Nenhuma"
+  "Não possui"
 ) // Pergunta
 
 ATRIBUTO "possui_historico_clinico_relevante" TEXTO ("Sim", "Não")
@@ -74,7 +74,7 @@ ATRIBUTO "possui_historico_clinico_relevante" TEXTO ("Sim", "Não")
 ATRIBUTO "historico_farmacoterapeutico" TEXTO (
   "Tratamentos prévios ou concomitantes com falha terapêutica",
   "Tratamentos prévios ou concomitantes com reações adversas",
-  "Sem histórico relevante"
+  "Sem histórico de tratamentos relevante"
 ) // Pergunta
 
 // -------------------- Objetivos --------------------
@@ -162,12 +162,7 @@ REGRA "historico_clinico_relavante" (
 
 REGRA "historico_clinico_nao_relavante" (
   SE
-      "historico_clinico" <> "Hipertensão"
-    E "historico_clinico" <> "Insuficiência cardíaca"
-    E "historico_clinico" <> "insuficiência renal"
-    E "historico_clinico" <> "Doença gastrointestinal"
-    E "historico_clinico" <> "Asma"
-    E "historico_clinico" <> "Bronquite"
+      "historico_clinico" = "Não possui"
   ENTAO
     "possui_historico_clinico_relevante" = "Não"
 )
@@ -198,7 +193,7 @@ REGRA "problema_autodelimitado" (
     E ("possui_outros_sintomas" = "Não" OU "sintomas_graves" = "Não")
     E "primeira_dismenorreia" <> "Início dos sinais/sintomas após 25 anos de idade (30 a 40 anos)"
     E "possui_historico_clinico_relevante" = "Não"
-    E "historico_farmacoterapeutico" = "Sem histórico relevante"
+    E "historico_farmacoterapeutico" = "Sem histórico de tratamentos relevante"
   ENTAO
       "decisao" = "autodelimitado"
 )

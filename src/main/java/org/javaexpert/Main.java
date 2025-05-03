@@ -35,12 +35,12 @@ public class Main {
         manager.addOptionsQuestion("Como o paciente descreve a intensidade da dor?", "intesidade_dor");
 
         manager.addOptionsQuestion("Além da dor, há outros sintomas relevantes no quadro clínico?", "possui_outros_sintomas");
-        manager.addMultiOptionsQuestion("O paciente apresenta algum dos seguintes sintomas associados?", "outros_sintomas");
+        manager.addMultiOptionsQuestion("O paciente apresenta algum dos seguintes sintomas associados?", "outros_sintomas", "Nenhum dos sintomas");
 
         manager.addOptionsQuestion("Qual foi a idade ou período em que surgiram as primeiras cólicas menstruais?", "primeira_dismenorreia");
 
-        manager.addMultiOptionsQuestion("O paciente possui histórico de alguma das seguintes condições clínicas?", "historico_clinico");
-        manager.addMultiOptionsQuestion("O paciente já tentou tratamento recente para os sintomas?", "historico_farmacoterapeutico");
+        manager.addMultiOptionsQuestion("O paciente possui histórico de alguma das seguintes condições clínicas?", "historico_clinico", "Não possui");
+        manager.addMultiOptionsQuestion("O paciente já tentou tratamento recente para os sintomas?", "historico_farmacoterapeutico", "Sem histórico de tratamentos relevante");
 
         manager.runQuiz();
     }
@@ -122,6 +122,11 @@ public class Main {
         public void addMultiOptionsQuestion(String text, String attr) {
             expert.addAskable(attr);
             quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr));
+        }
+
+        public void addMultiOptionsQuestion(String text, String attr, String exclusiveOption) {
+            expert.addAskable(attr);
+            quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr), exclusiveOption);
         }
 
         private void runResult() {

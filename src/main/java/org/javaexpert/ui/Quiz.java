@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -56,6 +57,13 @@ public class Quiz {
 
     public void newMultiOptionQuestion(String id, String text, List<String> options) {
         var question = new MultiOptionQuestion(id, text, options);
+        questions.add(question);
+        cards.add(question, id);
+    }
+
+
+    public void newMultiOptionQuestion(String id, String text, List<String> options, String exclusiveOption) {
+        var question = new MultiOptionQuestion(id, text, options, exclusiveOption);
         questions.add(question);
         cards.add(question, id);
     }
@@ -228,9 +236,16 @@ public class Quiz {
 
         private final Set<String> selectedOptions = new HashSet<>();
         private final List<JCheckBox> checkBoxes;
+        private final String exclusiveOption;
 
         MultiOptionQuestion(String id, String text, List<String> options) {
+            this(id, text, options, null);
+        }
+
+        MultiOptionQuestion(String id, String text, List<String> options, String exclusiveOption) {
             super(id, text);
+            assert options.contains(exclusiveOption);
+            this.exclusiveOption = exclusiveOption;
             var checkBoxPanel = new JPanel();
             checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
             add(checkBoxPanel, BorderLayout.CENTER);
@@ -241,7 +256,19 @@ public class Quiz {
             var select = ((JCheckBox) e.getItem()).getText();
             if (e.getStateChange() == ItemEvent.DESELECTED) {
                 selectedOptions.remove(select);
+                if (Objects.equals(select, exclusiveOption)) {
+                    checkBoxes.forEach(cb -> cb.setEnabled(true));
+                }
             } else {
+                if (exclusiveOption != null && Objects.equals(select, exclusiveOption)) {
+                    checkBoxes.forEach(cb -> {
+                        if (!cb.getText().equals(select)) {
+                            cb.setSelected(false);
+                            cb.setEnabled(false);
+                        }
+                    });
+                }
+
                 selectedOptions.add(select);
             }
 
