@@ -50,7 +50,7 @@ public class Main {
         manager.addOptionsQuestion("Além da dor, há outros sintomas relevantes no quadro clínico?", "possui_outros_sintomas");
         manager.addMultiOptionsQuestion("O paciente apresenta algum dos seguintes sintomas associados?", "outros_sintomas", "Nenhum dos sintomas");
 
-        manager.addOptionsQuestion("Qual foi a idade ou período em que surgiram as primeiras cólicas menstruais?", "primeira_dismenorreia");
+        manager.addOptionsQuestion("Qual foi o período em que surgiram as primeiras cólicas menstruais?", "primeira_dismenorreia");
 
         manager.addMultiOptionsQuestion("O paciente possui histórico de alguma das seguintes condições clínicas?", "historico_clinico", "Não possui");
         manager.addMultiOptionsQuestion("O paciente já tentou tratamento recente para os sintomas?", "historico_farmacoterapeutico", "Sem histórico de tratamentos relevante");

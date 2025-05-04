@@ -42,7 +42,7 @@ ATRIBUTO "outros_sintomas" TEXTO
   "Dor na coxa",
   "Dor abdominal associada à diarreia, náuseas, vômitos ou queimação",
   "Dor periumbilical que irradia para o quadrante inferior direito",
-  "Dor suprapúbica, associada à urgência urinária e/ou hematúria, independentemente da menstruação",
+  "Dor suprapúbica, associada à urgência urinária e/ou hematúria, sem relação com o ciclo menstrual",
   "Cefaleia vascular frequente ou intensa",
   "Alterações do sistema urinário, como dor ao urinar, urgência miccional e/ou presença de sangue na urina",
   "Menorragia, oligomenorreia, sangramento no período intermenstrual",
@@ -124,7 +124,7 @@ REGRA "sintomas_sao_graves" (
     E (
          "outros_sintomas" = "Dor abdominal associada à diarreia, náuseas, vômitos ou queimação"
       OU "outros_sintomas" = "Dor periumbilical que irradia para o quadrante inferior direito"
-      OU "outros_sintomas" = "Dor suprapúbica, associada à urgência urinária e/ou hematúria, independentemente da menstruação"
+      OU "outros_sintomas" = "Dor suprapúbica, associada à urgência urinária e/ou hematúria, sem relação com o ciclo menstrual"
       OU "outros_sintomas" = "Cefaleia vascular frequente ou intensa"
       OU "outros_sintomas" = "Alterações do sistema urinário, como dor ao urinar, urgência miccional e/ou presença de sangue na urina"
       OU "outros_sintomas" = "Menorragia, oligomenorreia, sangramento no período intermenstrual"
@@ -139,7 +139,7 @@ REGRA "sintomas_nao_sao_graves" (
     OU (
          "outros_sintomas" <> "Dor abdominal associada à diarreia, náuseas, vômitos ou queimação"
       E  "outros_sintomas" <> "Dor periumbilical que irradia para o quadrante inferior direito"
-      E  "outros_sintomas" <> "Dor suprapúbica, associada à urgência urinária e/ou hematúria, independentemente da menstruação"
+      E  "outros_sintomas" <> "Dor suprapúbica, associada à urgência urinária e/ou hematúria, sem relação com o ciclo menstrual"
       E  "outros_sintomas" <> "Cefaleia vascular frequente ou intensa"
       E  "outros_sintomas" <> "Alterações do sistema urinário, como dor ao urinar, urgência miccional e/ou presença de sangue na urina"
       E  "outros_sintomas" <> "Menorragia, oligomenorreia, sangramento no período intermenstrual"

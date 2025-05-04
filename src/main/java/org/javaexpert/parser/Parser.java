@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static org.javaexpert.Asserts.assertFalse;
 import static org.javaexpert.Asserts.assertNotNull;
 import static org.javaexpert.Asserts.assertTrue;
 import static org.javaexpert.parser.Token.TokenType.CLOSE_PAR;
@@ -131,8 +130,7 @@ public class Parser {
             } else {
                 conclusions.add(fact);
             }
-        }
-        while (lexer.requireNextToken().isAND());
+        } while (lexer.requireNextToken().isAND());
 
         lexer.assertLastToken(CLOSE_PAR);
         return conclusions;

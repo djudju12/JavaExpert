@@ -36,6 +36,7 @@ public class Quiz {
     private final JButton backButton = new JButton("Anterior");
     private final JButton nextButton = new JButton("Próximo");
     private boolean inHome = false;
+    private boolean hasHome = false;
 
     private String firstQuestion;
     private final Map<String, Object> answers = new HashMap<>();
@@ -83,7 +84,6 @@ public class Quiz {
         questionLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
 
         var textPane = new JTextPane();
-        textPane.setFont(new Font("SansSerif", Font.PLAIN, 16));
         textPane.setEditable(false);
         var doc = textPane.getStyledDocument();
         var attributes = new SimpleAttributeSet();
@@ -99,6 +99,7 @@ public class Quiz {
 
         main.add(questionLabel, BorderLayout.NORTH);
         main.add(scrollPane, BorderLayout.CENTER);
+        hasHome = true;
         cards.add(main, "home");
     }
 
@@ -107,7 +108,7 @@ public class Quiz {
     }
 
     public void runGui(boolean fromHome) {
-        inHome = fromHome;
+        inHome = hasHome && fromHome;
         resetState();
         if (frame == null) {
             frame = createFrame();
@@ -232,8 +233,9 @@ public class Quiz {
 
         options.forEach(opt -> {
             var cb = new JCheckBox(opt);
-            cb.setText("<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH - 50, opt));
-            cb.setBorder(BorderFactory.createEmptyBorder(0, 10, 20, 0));
+            cb.setText("<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH - 55, opt));
+            cb.setBorder(BorderFactory.createEmptyBorder(0, 10, 20, 30));
+            cb.setFocusable(false);
             cb.setBackground(BG_BODY);
             cb.setBorderPainted(true);
             checkBoxes.put(cb, opt);
