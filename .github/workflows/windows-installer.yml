@@ -1,0 +1,42 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 22
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 22
+
+      - name: Build fat JAR with Maven
+        run: mvn clean package
+
+      - name: Package app with jpackage
+        run: |
+          jpackage ^
+            --input target ^
+            --name JavaExpert ^
+            --main-jar java-expert-0.0.1-jar-with-dependencies.jar ^
+            --main-class org.javaexpert.Main ^
+            --type exe ^
+            --app-version 1.0.0 ^
+            --win-shortcut ^
+            --win-dir-chooser ^
+            --win-menu ^
+            --win-menu-group "Java Expert"
+        shell: cmd
+
+      - name: Upload EXE as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MySwingApp-Installer
+          path: MySwingApp/*.exe
