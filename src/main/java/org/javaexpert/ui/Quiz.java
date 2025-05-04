@@ -2,6 +2,9 @@ package org.javaexpert.ui;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -17,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import static javax.swing.SwingConstants.SOUTH;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Quiz {
@@ -32,6 +36,7 @@ public class Quiz {
     private final List<Question> questions = new ArrayList<>();
     private final JButton backButton = new JButton("Anterior");
     private final JButton nextButton = new JButton("Próximo");
+    private boolean inHome = false;
 
     private String firstQuestion;
     private final Map<String, Object> answers = new HashMap<>();
@@ -66,14 +71,37 @@ public class Quiz {
         cards.add(question, id);
     }
 
-
     public void newMultiOptionQuestion(String id, String text, List<String> options, String exclusiveOption) {
         var question = new MultiOptionQuestion(id, text, options, exclusiveOption);
         questions.add(question);
         cards.add(question, id);
     }
 
+    public void withHome(String title, String text) {
+        var main = new JPanel(new BorderLayout(20, 20));
+        main.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
+        var questionLabel = new JLabel("<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH, title));
+        questionLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        var textPanel = new JTextPane();
+        textPanel.setText(text);
+
+        var scrollPane = new JScrollPane(textPanel);
+        configureScrollable(scrollPane);
+//        main.setBackground(bg);
+        textPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+
+        main.add(questionLabel, BorderLayout.NORTH);
+        main.add(textPanel, BorderLayout.CENTER);
+        cards.add(main, "home");
+    }
+
     public void runGui() {
+        runGui(false);
+    }
+
+    public void runGui(boolean fromHome) {
+        inHome = fromHome;
         resetState();
         if (frame == null) {
             frame = createFrame();
@@ -140,21 +168,30 @@ public class Quiz {
     }
 
     private void nextCard() {
-        if (!inLastCard()) {
+        if (inHome) {
+            inHome = false;
+            current = 0;
+        } else if (!inLastCard()) {
             current += 1;
             showCurrentCard();
         }
     }
 
     private void previousCard() {
-        if (notInFirstCard()) {
+        if (inHome) {
+            backButton.setVisible(false);
+        } else if (notInFirstCard()) {
             current -= 1;
             showCurrentCard();
         }
     }
 
     private void showCurrentCard() {
-        ((CardLayout)cards.getLayout()).show(cards, hist.get(current));
+        if (inHome) {
+            ((CardLayout)cards.getLayout()).show(cards, "home");
+        } else {
+            ((CardLayout)cards.getLayout()).show(cards, hist.get(current));
+        }
     }
 
     private boolean inLastCard() {
@@ -190,17 +227,20 @@ public class Quiz {
         });
 
         scrollPane.setViewportView(main);
+        configureScrollable(scrollPane);
+        main.setBackground(bg);
+        main.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+
+        return checkBoxes;
+    }
+
+    private static void configureScrollable(JScrollPane scrollPane) {
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 0, 20),
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true)
         ));
-        main.setBackground(bg);
-
-        main.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
-
-        return checkBoxes;
     }
 
     public void onQuestionAsnwered(BiFunction<String, Object, String> function) {

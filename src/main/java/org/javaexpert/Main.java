@@ -26,6 +26,8 @@ public class Main {
     private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
         var manager = new QuizManager("Problema de Saúde Autodelimitado: Dismenorreia", Expert.fromFile("dismenorreia.ex"));
 
+        manager.setHomePage("Decisão Sobre Problema de Saúde Autodelimitado: Dismenorreia", "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
+
         manager.addOptionsQuestion("Qual é a relação temporal entre o início da dor e o ciclo menstrual?", "dor_inicio");
 
         manager.addOptionsQuestion("Como se caracteriza a dor do paciente?", "caracteristica_dor");
@@ -123,6 +125,10 @@ public class Main {
             quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr));
         }
 
+        public void setHomePage(String title, String text){
+            quiz.withHome(title, text);
+        }
+
         public void addMultiOptionsQuestion(String text, String attr, String exclusiveOption) {
             expert.addAskable(attr);
             quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr), exclusiveOption);
@@ -139,7 +145,7 @@ public class Main {
             var firstQuestionOpt = expert.thinkIfNotConclusiveAskQuestion();
             if (firstQuestionOpt.isPresent()) {
                 quiz.setFirstQuestion(firstQuestionOpt.get());
-                quiz.runGui();
+                quiz.runGui(true);
             } else {
                 runResult();
             }
