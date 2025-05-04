@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import static javax.swing.SwingConstants.SOUTH;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Quiz {
@@ -28,6 +26,7 @@ public class Quiz {
     private final static int WIDTH = 720;
     private final static int HEIGHT = 400;
     private final static int TEXT_WIDTH = Quiz.WIDTH - 20*5 - 70;
+    private final static Color BG_BODY = new Color(245, 245, 245);
 
     private JFrame frame;
     private final String title;
@@ -83,16 +82,23 @@ public class Quiz {
         var questionLabel = new JLabel("<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH, title));
         questionLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-        var textPanel = new JTextPane();
-        textPanel.setText(text);
+        var textPane = new JTextPane();
+        textPane.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        textPane.setEditable(false);
+        var doc = textPane.getStyledDocument();
+        var attributes = new SimpleAttributeSet();
+        StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_JUSTIFIED);
+        doc.setParagraphAttributes(0, doc.getLength(), attributes, false);
 
-        var scrollPane = new JScrollPane(textPanel);
+        textPane.setText(text);
+
+        var scrollPane = new JScrollPane(textPane);
         configureScrollable(scrollPane);
-//        main.setBackground(bg);
-        textPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+        textPane.setBackground(BG_BODY);
+        textPane.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
         main.add(questionLabel, BorderLayout.NORTH);
-        main.add(textPanel, BorderLayout.CENTER);
+        main.add(scrollPane, BorderLayout.CENTER);
         cards.add(main, "home");
     }
 
@@ -147,8 +153,6 @@ public class Quiz {
         });
 
         nextButton.addActionListener(_ -> {
-            var question = hist.get(current);
-            answerQuestion(question, answers.get(question));
             nextCard();
             updateButtons();
         });
@@ -171,10 +175,15 @@ public class Quiz {
         if (inHome) {
             inHome = false;
             current = 0;
-        } else if (!inLastCard()) {
-            current += 1;
-            showCurrentCard();
+        } else {
+            var question = hist.get(current);
+            answerQuestion(question, answers.get(question));
+            if (!inLastCard()) {
+                current += 1;
+            }
         }
+
+        showCurrentCard();
     }
 
     private void previousCard() {
@@ -203,14 +212,20 @@ public class Quiz {
     }
 
     private void updateButtons() {
-        backButton.setEnabled(notInFirstCard());
-        if (current < hist.size()) {
-            nextButton.setEnabled(answers.get(hist.get(current)) != null);
+        backButton.setVisible(!inHome);
+        if (inHome) {
+            nextButton.setEnabled(true);
+            nextButton.setText("Iniciar");
+        } else {
+            nextButton.setText("Próximo");
+            backButton.setEnabled(notInFirstCard());
+            if (current < hist.size()) {
+                nextButton.setEnabled(answers.get(hist.get(current)) != null);
+            }
         }
     }
 
     private Map<JCheckBox, String> createCheckBoxes(JScrollPane scrollPane, ItemListener listener, List<String> options) {
-        var bg = new Color(245, 245, 245);
         var main = new JPanel();
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
         var checkBoxes = new HashMap<JCheckBox, String>();
@@ -219,7 +234,7 @@ public class Quiz {
             var cb = new JCheckBox(opt);
             cb.setText("<html><body style='width: %spx'>%s".formatted(TEXT_WIDTH - 50, opt));
             cb.setBorder(BorderFactory.createEmptyBorder(0, 10, 20, 0));
-            cb.setBackground(bg);
+            cb.setBackground(BG_BODY);
             cb.setBorderPainted(true);
             checkBoxes.put(cb, opt);
             main.add(cb);
@@ -228,7 +243,7 @@ public class Quiz {
 
         scrollPane.setViewportView(main);
         configureScrollable(scrollPane);
-        main.setBackground(bg);
+        main.setBackground(BG_BODY);
         main.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
 
         return checkBoxes;
