@@ -34,6 +34,10 @@ jobs:
             --win-menu ^
             --win-menu-group "Java Expert"
         shell: cmd
+      
+      - name: Debuf
+        run: dir
+        shell: cmd
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
