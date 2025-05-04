@@ -1,3 +1,4 @@
+package tests;
 import org.javaexpert.expert.Expert;
 
 import java.io.IOException;
@@ -35,6 +36,10 @@ public class Runner {
                 System.out.printf("[%d] %s: FAILED\n", total, test.name());
                 e.printStackTrace(System.out);
             }
+        }
+
+        if (total != passed) {
+            System.exit(1);
         }
 
         System.out.printf("Tests summary: %d/%d\n", passed, total);
