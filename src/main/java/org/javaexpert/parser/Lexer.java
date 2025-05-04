@@ -204,11 +204,11 @@ public class Lexer {
         return new Location(filePath, row, col - tokenLen);
     }
 
-    private String readFile(String filePath) throws IOException {
-        var in = this.getClass().getClassLoader().getResource(filePath);
+    private String readFile(String filePath) {
+        var in = this.getClass().getClassLoader().getResourceAsStream(filePath);
         assertNotNull(in, "resource not found");
         return new BufferedReader(
-                new InputStreamReader((BufferedInputStream) in.getContent(), StandardCharsets.UTF_8)
+                new InputStreamReader(in, StandardCharsets.UTF_8)
         ).lines().parallel().collect(Collectors.joining("\n"));
     }
 }
