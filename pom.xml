@@ -10,25 +10,92 @@
     <description>java-expert</description>
     <properties>
         <java.version>22</java.version>
-        <maven.compiler.source>22</maven.compiler.source>
-        <maven.compiler.target>22</maven.compiler.target>
+        <main.class>org.javaexpert.Main</main.class>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <version>3.1.2</version>
-            <type>maven-plugin</type>
-        </dependency>
-    </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <plugins>
+
+            <!-- Compiler plugin for Java 22 -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Create a fat JAR -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Run jpackage -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>run-custom-tests</id>
+                        <phase>test</phase> <!-- or verify, or integration-test -->
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <classpathScope>test</classpathScope>
+                            <mainClass>tests.Runner</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-installer</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>jpackage</executable>
+                            <arguments>
+                                <argument>--input</argument>
+                                <argument>${project.build.directory}</argument>
+                                <argument>--name</argument>
+                                <argument>MySwingApp</argument>
+                                <argument>--main-jar</argument>
+                                <argument>${project.build.finalName}-jar-with-dependencies.jar</argument>
+                                <argument>--main-class</argument>
+                                <argument>${main.class}</argument>
+                                <argument>--type</argument>
+                                <argument>app-image</argument>
+                                <!-- Optional icon -->
+                                <!-- <argument>icon</argument>
+                                <argument>${project.basedir}/src/main/resources/app.ico</argument> -->
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
