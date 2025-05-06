@@ -20,23 +20,34 @@ jobs:
       - name: Build fat JAR with Maven
         run: mvn clean package
 
+      - name: Create custom runtime 
+        run: |
+          jlink.exe ^
+            --output custom-runtime ^
+            --add-modules java.base,java.desktop ^
+            --strip-debug --no-header-files --no-man-pages ^
+            --verbose
+        shell: cmd
+
       - name: Package app with jpackage
         run: |
-          jpackage ^
+          jpackage.exe ^
             --input target ^
             --name JavaExpert ^
             --main-jar java-expert-0.0.1-jar-with-dependencies.jar ^
             --main-class org.javaexpert.Main ^
-            --type exe ^
+            --type app-image ^
             --app-version 1.0.0 ^
-            --win-shortcut ^
-            --win-dir-chooser ^
-            --win-menu ^
-            --win-menu-group "Java Expert"
+            --runtime-image custom-runtime
+        shell: cmd
+
+      - name: Zip the app folder
+        run: |
+          tar.exe -acvf java-expert.zip JavaExpert
         shell: cmd
       
-      - name: Upload EXE as artifact
+      - name: Upload App as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: JavaExpert-Installer
-          path: JavaExpert-1.0.0.exe
+          name: JavaExpert
+          path: java-expert.zip
