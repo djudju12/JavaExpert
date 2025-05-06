@@ -33,7 +33,7 @@ jobs:
         run: |
           jpackage.exe ^
             --input target ^
-            --name JavaExpert ^
+            --name Especialista ^
             --main-jar java-expert-0.0.1-jar-with-dependencies.jar ^
             --main-class org.javaexpert.Main ^
             --type app-image ^
@@ -45,4 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Especialista
-          path: JavaExpert
+          path: Especialista
