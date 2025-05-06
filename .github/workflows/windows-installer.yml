@@ -44,5 +44,5 @@ jobs:
       - name: Upload App as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: JavaExpert
+          name: Especialista
           path: JavaExpert
