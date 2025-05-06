@@ -59,38 +59,13 @@
                 <executions>
                     <execution>
                         <id>run-custom-tests</id>
-                        <phase>test</phase> <!-- or verify, or integration-test -->
+                        <phase>test</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
                         <configuration>
                             <classpathScope>test</classpathScope>
                             <mainClass>tests.Runner</mainClass>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>create-installer</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>jpackage</executable>
-                            <arguments>
-                                <argument>--input</argument>
-                                <argument>${project.build.directory}</argument>
-                                <argument>--name</argument>
-                                <argument>MySwingApp</argument>
-                                <argument>--main-jar</argument>
-                                <argument>${project.build.finalName}-jar-with-dependencies.jar</argument>
-                                <argument>--main-class</argument>
-                                <argument>${main.class}</argument>
-                                <argument>--type</argument>
-                                <argument>app-image</argument>
-                                <!-- Optional icon -->
-                                <!-- <argument>icon</argument>
-                                <argument>${project.basedir}/src/main/resources/app.ico</argument> -->
-                            </arguments>
                         </configuration>
                     </execution>
                 </executions>
