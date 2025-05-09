@@ -17,26 +17,22 @@ public class Main {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         setUIFont(new javax.swing.plaf.FontUIResource("SansSerif", Font.PLAIN, 16));
 
-        decisaoProblemaSaudeAutodelimitado_desmenorreia();
+        decisaoProblemaSaudeAutodelimitado_dismenorreia();
 //        qualidadeProdutoExample();
 //        presenteExample();
 //        exemplAula();
     }
 
-    private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
+    private static void decisaoProblemaSaudeAutodelimitado_dismenorreia() throws IOException {
         var manager = new QuizManager("Problema de Saúde Autolimitado: Dismenorreia", Expert.fromFile("dismenorreia.ex"));
 
         manager.setHomePage("Decisão Sobre Problema de Saúde Autolimitado: Dismenorreia",
             """
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis sodales sodales. Aliquam euismod odio non urna pellentesque ultricies. Nulla mollis lacus sit amet urna elementum molestie. Fusce justo ipsum, aliquet vestibulum nulla bibendum, iaculis efficitur sem. Praesent vel luctus nisi. Vivamus et diam porta, sodales ipsum ac, posuere orci. Fusce ex justo, suscipit vel suscipit nec, rutrum id sem. Aenean pharetra tempor tellus, in congue ante. Praesent convallis felis eu consequat dictum. Donec tempus erat nec odio gravida aliquam. Suspendisse ac arcu tincidunt, vestibulum neque et, pretium neque. Suspendisse dictum nibh ac risus fermentum lobortis. Quisque rhoncus massa a sapien ultrices, pharetra faucibus mauris mattis. Fusce tincidunt diam at ligula finibus, in iaculis erat pellentesque. Suspendisse potenti.
+            Este sistema foi desenvolvido com o objetivo de auxiliar profissionais farmacêuticos na condução do atendimento clínico relacionado à dismenorreia — uma condição comum caracterizada por dor uterina durante o período menstrual. Embora muitas vezes seja autolimitada, é essencial avaliar cuidadosamente cada caso, a fim de identificar possíveis sinais de outras condições, como endometriose, adenomiose ou miomas uterinos.
             
-            Aenean magna risus, lobortis eu scelerisque quis, malesuada non lorem. Etiam a erat ut tellus mattis sollicitudin. Aenean sollicitudin cursus sapien, at euismod justo. Nulla a auctor velit. Integer pretium sem non ante dapibus venenatis. Aliquam eget faucibus augue. Pellentesque pulvinar, sapien non consectetur pulvinar, ante felis semper urna, a sodales ante massa non urna. Sed mattis condimentum risus quis laoreet. Aliquam ut velit non tellus porta vulputate. Integer eget orci vitae nisl ultricies tincidunt. Nunc id sollicitudin nunc. Aenean a nunc quis quam mattis imperdiet. Phasellus ut turpis faucibus, eleifend dui id, sagittis ante. Pellentesque et elit id dui tincidunt auctor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;
+            Com base no algoritmo clínico oficial do Conselho Federal de Farmácia (CFF), o sistema orienta o processo de anamnese por meio de perguntas estruturadas, permitindo ao farmacêutico avaliar os sintomas relatados e, assim, tomar decisões mais seguras e embasadas sobre o plano de cuidado. Caso seja identificado que pode se tratar de um quadro mais grave, o sistema indicará a necessidade de encaminhamento para outro profissional ou serviço de saúde.
             
-            Aenean maximus efficitur purus, id efficitur quam. Donec vulputate, risus ac vehicula egestas, nibh ex finibus nibh, eu venenatis nisl ex nec massa. Quisque odio nunc, eleifend quis arcu quis, commodo auctor eros. Sed porta dolor lobortis, rutrum lacus eu, laoreet dolor. Sed posuere nibh urna. Suspendisse a tellus scelerisque, hendrerit urna vel, dignissim neque. Mauris nec felis eu diam condimentum iaculis id vitae mauris. Mauris vel ligula purus.
-            
-            Morbi enim augue, pulvinar sit amet neque vel, pulvinar maximus nibh. Aenean et metus id erat mattis elementum. Maecenas volutpat dolor metus, sit amet pulvinar mi laoreet sollicitudin. Mauris pharetra lacinia arcu non placerat. Proin pellentesque auctor nibh volutpat condimentum. Morbi interdum sed elit venenatis tempus. Phasellus non suscipit dolor, ut elementum felis. Vestibulum fermentum consequat dui, ut hendrerit nunc ultricies at. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam vitae condimentum ante. Proin dapibus dui a ligula semper, accumsan auctor augue suscipit.
-            
-            In non eleifend tortor. Ut eu facilisis dui, et pretium risus. Etiam vitae nunc vestibulum, sagittis leo a, suscipit ex. Duis sit amet augue ac mi euismod vestibulum nec eget nisl. Maecenas purus dui, sollicitudin a semper id, laoreet quis est. Suspendisse non justo faucibus, fringilla dui at, malesuada erat. Pellentesque interdum eget justo in feugiat. Proin ut mauris ligula. Donec iaculis, nulla a blandit dictum, ipsum turpis faucibus justo, ut consequat velit massa eu lectus. Donec eget eleifend tortor, ac viverra ipsum. Quisque ultricies posuere pharetra. Nullam a molestie odio, in dapibus ligula.
+            De forma simples, prática e segura, esta ferramenta busca otimizar a atuação clínica do farmacêutico, garantindo um atendimento mais preciso, eficiente e centrado no paciente.
             """
         );
 
