@@ -13,7 +13,6 @@ import org.javaexpert.parser.Parser;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class Expert {
     }
 
     public Map<String, Fact> getObjectivesConclusions() {
-        Map<String, Fact> m = HashMap.newHashMap(objectives.size());
+        var m = new TreeMap<String, Fact>();
         objectives.forEach(o -> m.put(o, facts.get(o)));
         return m;
     }

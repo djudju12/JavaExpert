@@ -78,9 +78,26 @@ ATRIBUTO "historico_farmacoterapeutico" TEXTO (
 ) // Pergunta
 
 // -------------------- Objetivos --------------------
-ATRIBUTO "decisao" TEXTO ("encaminhar", "autodelimitado")
-OBJETIVOS ("decisao")
+ATRIBUTO "tratamento_farmacologico" TEXTO (
+  "1ª linha - AINEs (ibuprofeno, naproxeno)",
+  "2ª linha - paracetamol",
+  "3ª linha - antiespasmódico (monoterapia ou em combinações fixas",
+  "-"
+)
 
+ATRIBUTO "tratamento_nao_farmacologico" TEXTO (
+  "Aplicação de calor local (bolsa térmica de água quente, gel ou adesivo térmico)",
+  "Prática regular de exercícios físicos",
+  "Eletroestimulação transcutânea",
+  "Acuestimulação",
+  "Cessação tabágica",
+  "Mudanças dietéticas (evitar consumo de alimentos gordurosos; aumentar o consumo de frutas e vegetais)",
+  "-"
+)
+
+ATRIBUTO "decisao" TEXTO ("Encaminhar para outro profissional/serviço de saúde", "Problema de saúde autolimitado")
+
+OBJETIVOS ("decisao", "tratamento_farmacologico", "tratamento_nao_farmacologico")
 
 // -------------------- Regras Intermediárias --------------------
 
@@ -181,10 +198,10 @@ REGRA "deve_encaminhar" (
     OU "historico_farmacoterapeutico" = "Tratamentos prévios ou concomitantes com falha terapêutica"
     OU "historico_farmacoterapeutico" = "Tratamentos prévios ou concomitantes com reações adversas"
   ENTAO
-      "decisao" = "encaminhar"
+        "decisao" = "Encaminhar para outro profissional/serviço de saúde"
 )
 
-REGRA "problema_autodelimitado" (
+REGRA "problema_autolimitado" (
   SE
       "dor_inicio" = "Dor inicia 2 dias antes da menstruação, com redução progressiva em 72h"
     E "caracteristicas_incomuns" = "Não"
@@ -195,5 +212,14 @@ REGRA "problema_autodelimitado" (
     E "possui_historico_clinico_relevante" = "Não"
     E "historico_farmacoterapeutico" = "Sem histórico de tratamentos relevante"
   ENTAO
-      "decisao" = "autodelimitado"
+      "decisao" = "Problema de saúde autolimitado"
+    E "tratamento_nao_farmacologico" = "Aplicação de calor local (bolsa térmica de água quente, gel ou adesivo térmico)"
+    E "tratamento_nao_farmacologico" = "Prática regular de exercícios físicos"
+    E "tratamento_nao_farmacologico" = "Eletroestimulação transcutânea"
+    E "tratamento_nao_farmacologico" = "Acuestimulação"
+    E "tratamento_nao_farmacologico" = "Cessação tabágica"
+    E "tratamento_nao_farmacologico" = "Mudanças dietéticas (evitar consumo de alimentos gordurosos; aumentar o consumo de frutas e vegetais)"
+    E "tratamento_farmacologico" = "1ª linha - AINEs (ibuprofeno, naproxeno)"
+    E "tratamento_farmacologico" = "2ª linha - paracetamol"
+    E "tratamento_farmacologico" = "3ª linha - antiespasmódico (monoterapia ou em combinações fixas"
 )

@@ -118,6 +118,18 @@ public class Result {
         table.setFillsViewportHeight(true);
         table.setBorder(new MatteBorder(0, 1, 1, 1, Color.GRAY));
 
+        table.setFillsViewportHeight(true);
+
+        for (int row = 0; row < table.getRowCount(); row++) {
+            int rowHeight = table.getRowHeight();
+
+            Component comp = table.prepareRenderer(table.getCellRenderer(row, 1), row, 1);
+            rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+            table.setRowHeight(row, rowHeight);
+        }
+
+        table.getColumnModel().getColumn(1).setPreferredWidth(500);
+
         var scrollPane = new JScrollPane(table);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -155,7 +167,13 @@ public class Result {
         if (fact == null) {
             return "DESCONHECIDO";
         } else if (fact instanceof StringFact strFact) {
-            return String.join(",", strFact.value());
+            var sb = new StringBuilder();
+            sb.append("<html>");
+            for (var f: strFact.value()) {
+                sb.append("<p>%s</p>".formatted(f));
+            }
+            sb.append("</html>");
+            return sb.toString();
         }
 
         return fact.value().toString();

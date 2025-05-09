@@ -24,9 +24,9 @@ public class Main {
     }
 
     private static void decisaoProblemaSaudeAutodelimitado_desmenorreia() throws IOException {
-        var manager = new QuizManager("Problema de Saúde Autodelimitado: Dismenorreia", Expert.fromFile("dismenorreia.ex"));
+        var manager = new QuizManager("Problema de Saúde Autolimitado: Dismenorreia", Expert.fromFile("dismenorreia.ex"));
 
-        manager.setHomePage("Decisão Sobre Problema de Saúde Autodelimitado: Dismenorreia",
+        manager.setHomePage("Decisão Sobre Problema de Saúde Autolimitado: Dismenorreia",
             """
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis sodales sodales. Aliquam euismod odio non urna pellentesque ultricies. Nulla mollis lacus sit amet urna elementum molestie. Fusce justo ipsum, aliquet vestibulum nulla bibendum, iaculis efficitur sem. Praesent vel luctus nisi. Vivamus et diam porta, sodales ipsum ac, posuere orci. Fusce ex justo, suscipit vel suscipit nec, rutrum id sem. Aenean pharetra tempor tellus, in congue ante. Praesent convallis felis eu consequat dictum. Donec tempus erat nec odio gravida aliquam. Suspendisse ac arcu tincidunt, vestibulum neque et, pretium neque. Suspendisse dictum nibh ac risus fermentum lobortis. Quisque rhoncus massa a sapien ultrices, pharetra faucibus mauris mattis. Fusce tincidunt diam at ligula finibus, in iaculis erat pellentesque. Suspendisse potenti.
             
