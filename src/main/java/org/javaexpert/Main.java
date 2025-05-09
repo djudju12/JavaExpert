@@ -40,20 +40,38 @@ public class Main {
             """
         );
 
-        manager.addOptionsQuestion("Qual é a relação temporal entre o início da dor e o ciclo menstrual?", "dor_inicio");
+        manager.addOptionsQuestion("Qual é a relação temporal entre o início da dor e o ciclo menstrual?", "dor_inicio")
+                .withWhy("A relação da dor com o ciclo menstrual pode indicar origem ginecológica — dor cíclica, como a que antecede a menstruação, é típica da dismenorreia.");
 
-        manager.addOptionsQuestion("Como se caracteriza a dor do paciente?", "caracteristica_dor");
-        manager.addOptionsQuestion("Durante os ciclos menstruais, há alteração do local da dor?", "alteracao_do_local");
+        manager.addOptionsQuestion("Como se caracteriza a dor do paciente?", "caracteristica_dor")
+                .withWhy("A dor suprapúbica é localizada abaixo do umbigo e pode ter relação com o ciclo menstrual, sendo importante para diferenciar causas ginecológicas de outras condições abdominais.");
 
-        manager.addOptionsQuestion("Como o paciente descreve a intensidade da dor?", "intesidade_dor");
+        manager.addOptionsQuestion("Durante os ciclos menstruais, há alteração do local da dor?", "alteracao_do_local")
+                .withWhy("A mudança no local da dor durante o ciclo menstrual pode sugerir envolvimento de diferentes estruturas pélvicas, sendo um sinal relevante para investigação de condições como endometriose.");
 
-        manager.addOptionsQuestion("Além da dor, há outros sintomas relevantes no quadro clínico?", "possui_outros_sintomas");
-        manager.addMultiOptionsQuestion("O paciente apresenta algum dos seguintes sintomas associados?", "outros_sintomas", "Nenhum dos sintomas");
+        manager.addOptionsQuestion("Como o paciente descreve a intensidade da dor?", "intesidade_dor")
+                .withWhy("A intensidade da dor e sua resposta a medicamentos ajudam a diferenciar quadros funcionais de condições mais graves que exigem investigação aprofundada.");
 
-        manager.addOptionsQuestion("Qual foi o período em que surgiram as primeiras cólicas menstruais?", "primeira_dismenorreia");
+        manager.addOptionsQuestion("Além da dor, há outros sintomas relevantes no quadro clínico?", "possui_outros_sintomas")
+                .withWhy("Sintomas associados ajudam a identificar a causa da dor, pois certos padrões — como dor com diarreia ou alterações urinárias — sugerem condições específicas, como infecções ou distúrbios intestinais.");
 
-        manager.addMultiOptionsQuestion("O paciente possui histórico de alguma das seguintes condições clínicas?", "historico_clinico", "Não possui");
-        manager.addMultiOptionsQuestion("O paciente já tentou tratamento recente para os sintomas?", "historico_farmacoterapeutico", "Sem histórico de tratamentos relevante");
+        manager
+                .addMultiOptionsQuestion("O paciente apresenta algum dos seguintes sintomas associados?", "outros_sintomas")
+                .withExclusiveOption("Nenhum dos sintomas")
+                .withWhy("Sintomas associados ajudam a identificar a causa da dor, pois certos padrões sugerem condições específicas.");
+
+        manager.addOptionsQuestion("Qual foi o período em que surgiram as primeiras cólicas menstruais?", "primeira_dismenorreia")
+                .withWhy("A idade de início das cólicas menstruais pode ajudar a distinguir entre dismenorreia primária (geralmente precoce) e causas secundárias, como endometriose, que costumam surgir após os 25 anos.");
+
+        manager
+                .addMultiOptionsQuestion("O paciente possui histórico de alguma das seguintes condições clínicas?", "historico_clinico")
+                .withExclusiveOption("Não possui")
+                .withWhy("Condições clínicas pré-existentes podem influenciar tanto a causa da dor quanto a escolha do tratamento, exigindo maior cautela em abordagens medicamentosas.");
+
+        manager
+                .addMultiOptionsQuestion("O paciente já tentou tratamento recente para os sintomas?", "historico_farmacoterapeutico")
+                .withExclusiveOption("Sem histórico de tratamentos relevante")
+                .withWhy("Histórico de tratamentos anteriores, especialmente falhas ou reações adversas, pode indicar a necessidade de mudar a abordagem terapêutica ou investigar outras causas para os sintomas.");
 
         manager.runQuiz();
     }
@@ -122,28 +140,23 @@ public class Main {
 
         }
 
-        public void addNumericQuestion(String text, String attr) {
+        public Quiz.NumericQuestion addNumericQuestion(String text, String attr) {
             expert.addAskable(attr);
-            quiz.newNumericQuestion(attr, text);
+            return quiz.newNumericQuestion(attr, text);
         }
 
-        public void addOptionsQuestion(String text, String attr) {
+        public Quiz.OptionQuestion addOptionsQuestion(String text, String attr) {
             expert.addAskable(attr);
-            quiz.newOptionQuestion(attr, text, expert.getAttributesValues(attr));
+            return quiz.newOptionQuestion(attr, text, expert.getAttributesValues(attr));
         }
 
-        public void addMultiOptionsQuestion(String text, String attr) {
+        public Quiz.MultiOptionQuestion addMultiOptionsQuestion(String text, String attr) {
             expert.addAskable(attr);
-            quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr));
+            return quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr));
         }
 
         public void setHomePage(String title, String text){
             quiz.withHome(title, text);
-        }
-
-        public void addMultiOptionsQuestion(String text, String attr, String exclusiveOption) {
-            expert.addAskable(attr);
-            quiz.newMultiOptionQuestion(attr, text, expert.getAttributesValues(attr), exclusiveOption);
         }
 
         private void runResult() {

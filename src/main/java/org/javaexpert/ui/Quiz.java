@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Quiz {
@@ -35,6 +36,7 @@ public class Quiz {
     private final List<Question> questions = new ArrayList<>();
     private final JButton backButton = new JButton("Anterior");
     private final JButton nextButton = new JButton("Próximo");
+    private final JButton whyButton = new JButton("Por que?");
     private boolean inHome = false;
     private boolean hasHome = false;
 
@@ -53,28 +55,26 @@ public class Quiz {
         firstQuestion = question;
     }
 
-    public void newNumericQuestion(String id, String text) {
+    public NumericQuestion newNumericQuestion(String id, String text) {
         var question = new NumericQuestion(id, text);
         questions.add(question);
         cards.add(question, id);
+        return question;
     }
 
-    public void newOptionQuestion(String id, String text, List<String> options) {
+    public OptionQuestion newOptionQuestion(String id, String text, List<String> options) {
         var question = new OptionQuestion(id, text, options);
         questions.add(question);
         cards.add(question, id);
+        return question;
     }
 
-    public void newMultiOptionQuestion(String id, String text, List<String> options) {
+    public MultiOptionQuestion newMultiOptionQuestion(String id, String text, List<String> options) {
         var question = new MultiOptionQuestion(id, text, options);
         questions.add(question);
         cards.add(question, id);
-    }
 
-    public void newMultiOptionQuestion(String id, String text, List<String> options, String exclusiveOption) {
-        var question = new MultiOptionQuestion(id, text, options, exclusiveOption);
-        questions.add(question);
-        cards.add(question, id);
+        return question;
     }
 
     public void withHome(String title, String text) {
@@ -142,11 +142,21 @@ public class Quiz {
     }
 
     private void addComponentToPane(Container pane) {
-        var buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
-        buttonPanel.add(backButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(5, 1)));
-        buttonPanel.add(nextButton);
+        var buttonsPanel = new JPanel(new BorderLayout());
+
+        var whyButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        whyButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 20));
+        whyButtonPanel.add(whyButton);
+
+        var navButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navButtonsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 15));
+
+        navButtonsPanel.add(backButton);
+        navButtonsPanel.add(Box.createRigidArea(new Dimension(5, 1)));
+        navButtonsPanel.add(nextButton);
+
+        buttonsPanel.add(whyButtonPanel, BorderLayout.WEST);
+        buttonsPanel.add(navButtonsPanel, BorderLayout.EAST);
 
         backButton.addActionListener(_ -> {
             previousCard();
@@ -158,8 +168,20 @@ public class Quiz {
             updateButtons();
         });
 
+        whyButton.addActionListener(_ ->
+            getCurrentQuestion()
+                .ifPresent(
+                    q -> JOptionPane.showMessageDialog(
+                        q,
+                        "<html><body style='width: 300px'>%s".formatted(q.getWhy()),
+                        "Por que?",
+                        INFORMATION_MESSAGE
+                    )
+            )
+        );
+
         pane.add(cards);
-        pane.add(buttonPanel, BorderLayout.SOUTH);
+        pane.add(buttonsPanel, BorderLayout.SOUTH);
         updateButtons();
     }
 
@@ -204,6 +226,12 @@ public class Quiz {
         }
     }
 
+    private Optional<Question> getCurrentQuestion() {
+        if (inHome) return Optional.empty();
+        var id = hist.get(current);
+        return questions.stream().filter(q -> q.id.equals(id)).findFirst();
+    }
+
     private boolean inLastCard() {
         return current == hist.size() - 1;
     }
@@ -214,6 +242,7 @@ public class Quiz {
 
     private void updateButtons() {
         backButton.setVisible(!inHome);
+        whyButton.setVisible(!inHome);
         if (inHome) {
             nextButton.setEnabled(true);
             nextButton.setText("Iniciar");
@@ -223,6 +252,9 @@ public class Quiz {
             if (current < hist.size()) {
                 nextButton.setEnabled(answers.get(hist.get(current)) != null);
             }
+
+            var hasWhy = getCurrentQuestion().map(Question::hasWhy).orElse(false);
+            whyButton.setEnabled(hasWhy);
         }
     }
 
@@ -264,12 +296,16 @@ public class Quiz {
         this.onQuestionAnswered = function;
     }
 
-    class NumericQuestion extends Question {
+    public class NumericQuestion extends Question {
 
         private final JFormattedTextField field;
 
         public NumericQuestion(String id, String text) {
-            super(id, text);
+            this(id, text, null);
+        }
+
+        public NumericQuestion(String id, String text, String why) {
+            super(id, text, why);
             var numPanel = new JPanel();
             numPanel.setLayout(new BoxLayout(numPanel, BoxLayout.Y_AXIS));
 
@@ -310,23 +346,35 @@ public class Quiz {
         }
     }
 
-    class MultiOptionQuestion extends Question implements ItemListener {
+    public class MultiOptionQuestion extends Question implements ItemListener {
 
         private final Set<String> selectedOptions = new HashSet<>();
         private final Map<JCheckBox, String> checkBoxes;
-        private final String exclusiveOption;
+        private final Set<String> options;
+        private String exclusiveOption;
 
-        MultiOptionQuestion(String id, String text, List<String> options) {
-            this(id, text, options, null);
+        MultiOptionQuestion(String id, String text, List<String> options, String why) {
+            this(id, text, options, null, why);
         }
 
-        MultiOptionQuestion(String id, String text, List<String> options, String exclusiveOption) {
-            super(id, text);
+        MultiOptionQuestion(String id, String text, List<String> options) {
+            this(id, text, options, null, null);
+        }
+
+        MultiOptionQuestion(String id, String text, List<String> options, String exclusiveOption, String why) {
+            super(id, text, why);
             assert options.contains(exclusiveOption);
+            this.options = new HashSet<>(options);
             this.exclusiveOption = exclusiveOption;
             var checkBoxPanel = new JScrollPane();
             checkBoxes = createCheckBoxes(checkBoxPanel, this, options);
             add(checkBoxPanel, BorderLayout.CENTER);
+        }
+
+        public MultiOptionQuestion withExclusiveOption(String option) {
+            assert options.contains(exclusiveOption);
+            this.exclusiveOption = option;
+            return this;
         }
 
         @Override
@@ -362,12 +410,16 @@ public class Quiz {
         }
     }
 
-    class OptionQuestion extends Question implements ItemListener {
+    public class OptionQuestion extends Question implements ItemListener {
 
         private final Map<JCheckBox, String> checkBoxes;
 
         OptionQuestion(String id, String text, List<String> options) {
-            super(id, text);
+            this(id, text, options, null);
+        }
+
+        OptionQuestion(String id, String text, List<String> options, String why) {
+            super(id, text, why);
             var scrollPane = new JScrollPane();
             checkBoxes = createCheckBoxes(scrollPane, this, options);
             add(scrollPane, BorderLayout.CENTER);
@@ -399,13 +451,15 @@ public class Quiz {
         }
     }
 
-    abstract static class Question extends JPanel {
+    public abstract static class Question extends JPanel {
 
         final String id;
+        private String why;
 
-        Question(String id, String text) {
+        Question(String id, String text, String why) {
             super(new BorderLayout(20, 20));
             this.id = id;
+            this.why = why;
             setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
 
             var questionLabel = new JLabel(
@@ -414,6 +468,19 @@ public class Quiz {
 
             questionLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
             add(questionLabel, BorderLayout.NORTH);
+        }
+
+        public Question withWhy(String why) {
+            this.why = why;
+            return this;
+        }
+
+        public String getWhy() {
+            return why;
+        }
+
+        public boolean hasWhy() {
+            return why != null;
         }
 
         abstract void reset();
