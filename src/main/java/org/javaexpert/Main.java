@@ -28,7 +28,7 @@ public class Main {
 
         manager.setHomePage("Decisão Sobre Problema de Saúde Autolimitado: Dismenorreia",
             """
-            Este sistema foi desenvolvido com o objetivo de auxiliar profissionais farmacêuticos na condução do atendimento clínico relacionado à dismenorreia — uma condição comum caracterizada por dor uterina durante o período menstrual. Embora muitas vezes seja autolimitada, é essencial avaliar cuidadosamente cada caso, a fim de identificar possíveis sinais de outras condições, como endometriose, adenomiose ou miomas uterinos.
+            Este sistema foi desenvolvido com o objetivo de auxiliar profissionais farmacêuticos na condução do atendimento clínico relacionado à dismenorreia — uma condição comum caracterizada por dor uterina durante o período menstrual. Embora muitas vezes seja autolimitada, éessencial avaliar cuidadosamente cada caso, a fim de identificar possíveis sinais de outras condições, como endometriose, adenomiose ou miomas uterinos.
             
             Com base no algoritmo clínico oficial do Conselho Federal de Farmácia (CFF), o sistema orienta o processo de anamnese por meio de perguntas estruturadas, permitindo ao farmacêutico avaliar os sintomas relatados e, assim, tomar decisões mais seguras e embasadas sobre o plano de cuidado. Caso seja identificado que pode se tratar de um quadro mais grave, o sistema indicará a necessidade de encaminhamento para outro profissional ou serviço de saúde.
             

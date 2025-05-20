@@ -95,7 +95,10 @@ ATRIBUTO "tratamento_nao_farmacologico" TEXTO (
   "-"
 )
 
-ATRIBUTO "decisao" TEXTO ("Encaminhar para outro profissional/serviço de saúde", "Problema de saúde autolimitado")
+ATRIBUTO "decisao" TEXTO (
+  "Encaminhar para outro profissional/serviço de saúde",
+  "Problema de saúde autolimitado"
+)
 
 OBJETIVOS ("decisao", "tratamento_farmacologico", "tratamento_nao_farmacologico")
 
